@@ -1,0 +1,19 @@
+{
+  "name": "com.teach310.assetbundlehub",
+  "version": "0.0.1",
+  "displayName": "Asset Bundle Hub",
+  "description": "This is an example package",
+  "unity": "2021.3",
+  "unityRelease": "0b5",
+  "documentationUrl": "https://example.com/",
+  "keywords": [
+    "AssetBundle"
+  ],
+  "author": {
+    "name": "teach310"
+  },
+  "type": "library",
+  "dependencies": {
+    "com.unity.scriptablebuildpipeline": "1.20.2"
+  }
+}
