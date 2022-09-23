@@ -36,7 +36,8 @@ namespace AssetBundleHubEditor
                         }
 
                         // グループ内で1つ目ならば参照カウント
-                        if (groupDependencies.Add(depPath)) {
+                        if (groupDependencies.Add(depPath))
+                        {
                             if (dependenciesRefCount.ContainsKey(depPath))
                             {
                                 dependenciesRefCount[depPath] += 1;

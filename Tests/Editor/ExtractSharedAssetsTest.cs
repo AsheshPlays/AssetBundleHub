@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +19,7 @@ namespace AssetBundleHubEditorTests
             var extractSharedAssets = new ExtractSharedAssets();
             var sharedAssets = extractSharedAssets.Run(groups);
             Assert.AreEqual(sharedAssets.Count, 1);
-            Assert.AreEqual(sharedAssets[0], Utils.RootDir + "Tests/Editor/Fixtures/Prefabs/Dep/Square.png");   
+            Assert.AreEqual(sharedAssets[0], Utils.RootDir + "Tests/Editor/Fixtures/Prefabs/Dep/Square.png");
         }
     }
 }
