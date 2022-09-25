@@ -16,5 +16,6 @@
   "dependencies": {
     "com.unity.scriptablebuildpipeline": "1.20.2",
     "com.cysharp.unitask": "2.3.1"
-  }
+  },
+  "hideInEditor": false
 }
