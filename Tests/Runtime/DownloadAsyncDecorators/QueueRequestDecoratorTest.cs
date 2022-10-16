@@ -54,7 +54,7 @@ namespace AssetBundleHubTests
             Assert.That(counter.startCount, Is.EqualTo(1));  // キャパ以上なので待つ
             Assert.That(describedClass.RunningCount, Is.EqualTo(1));
             await task1;
-            // 待ちなし -> 待ってたやつやつを実行する場合はレスポンス返す前に次の実行してるので1フレーム待たない
+            await UniTask.Yield(); // 次のタスク開始は1フレーム後に実行されるので1フレーム待つ
             Assert.That(counter.startCount, Is.EqualTo(2));  // 1つ目が終わって2つ目が開始される
             Assert.That(counter.endCount, Is.EqualTo(1));
             await task2;
@@ -89,6 +89,7 @@ namespace AssetBundleHubTests
             Assert.That(counter.startCount, Is.EqualTo(runCapacity));  // キャパ以上なので待つ
             Assert.That(describedClass.RunningCount, Is.EqualTo(runCapacity));
             await tasks[0];
+            await UniTask.Yield();
             Assert.That(counter.startCount, Is.EqualTo(runCapacity + 1));  // 待ち状態のタスクが実行される
             Assert.That(counter.endCount, Is.EqualTo(1));
             Assert.That(describedClass.RunningCount, Is.EqualTo(runCapacity));

@@ -58,10 +58,19 @@ namespace AssetBundleHub
 
         async UniTaskVoid Run()
         {
+            bool waitFlag = true;
             while (q.Count != 0)
             {
                 var (completionSource, context, cancellationToken, next) = q.Dequeue();
                 RunningCount++;
+
+                // 呼び出し側のresponseに対する処理を先に実行したほうが自然なので、1フレーム待つ。
+                if(waitFlag)
+                {
+                    await UniTask.Yield();
+                    waitFlag = false;
+                }
+
                 try
                 {
                     var response = await next(context, cancellationToken);
