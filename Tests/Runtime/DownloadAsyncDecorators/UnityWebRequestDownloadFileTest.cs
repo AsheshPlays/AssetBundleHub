@@ -59,7 +59,8 @@ namespace AssetBundleHubTests
         [UnityTest]
         public IEnumerator 正常系_DownloadAsync() => UniTask.ToCoroutine(async () =>
         {
-            var context = new MockRequestContext(){
+            var context = new MockRequestContext()
+            {
                 URL = "https://teach310.github.io/AssetBundlesForDownloadTest/SBP/Prefabs001", // TODO AssetBundleSampleに変更
                 SavePath = testDir + "/Prefabs001"
             };
