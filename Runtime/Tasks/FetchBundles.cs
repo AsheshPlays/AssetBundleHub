@@ -28,23 +28,23 @@ namespace AssetBundleHub.Tasks
         {
             var requests = CreateDownloadRequests(context);
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            try
+            var tasks = DownloadFiles(requests, context.Shuffle, cts.Token);
+            foreach (var task in tasks)
             {
-                var tasks = DownloadFiles(requests, context.Shuffle, cts.Token);
-                foreach (var task in tasks)
+                try
                 {
                     int requestIndex = await task;
                     context.SetDownloadedAssetBundle(context.AssetBundleNames[requestIndex]);
                 }
-            }
-            catch (OperationCanceledException ex) when (ex.CancellationToken == cts.Token) { } // もしダウンロードのみがキャンセルされたら上流に伝搬せず握りつぶす。
-            catch (Exception ex) // TODO: ネットワークエラー以外は素通ししたい
-            {
-                context.Error = ex;
-                // ネットワークエラーまたはタイムアウトが発生したら後続のダウンロードは止める
-                // このCancelでエラーが発生した場合は想定外なのでそのまま上流に伝搬
-                // 後続のダウンロードの止め方これで正しいのか自信がないため意見がほしいところ。
-                cts.Cancel();
+                catch (OperationCanceledException ex) when (ex.CancellationToken == cts.Token) { } // キャンセルされたら上流に伝搬せず握りつぶす。
+                catch (Exception ex) // TODO: ネットワークエラー以外は素通ししたい
+                {
+                    context.Error = ex;
+                    // ネットワークエラーまたはタイムアウトが発生したら後続のダウンロードは止める
+                    // このCancelでエラーが発生した場合は想定外なのでそのまま上流に伝搬
+                    // 後続のダウンロードの止め方これで正しいのか自信がないため意見がほしいところ。
+                    cts.Cancel();
+                }
             }
         }
 
@@ -89,7 +89,7 @@ namespace AssetBundleHub.Tasks
                 Func<UniTaskCompletionSource<int>> takeCompletionSource = () =>
                 {
                     finishedCount++;
-                    return completionSources[finishedCount-1];
+                    return completionSources[finishedCount - 1];
                 };
 
                 DownloadFileAsync(takeCompletionSource, srcRequestIndex, request, cancellationToken).Forget();
