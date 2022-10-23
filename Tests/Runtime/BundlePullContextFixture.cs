@@ -95,5 +95,15 @@ namespace AssetBundleHubTests
         {
             throw new NotImplementedException();
         }
+
+        public void SetMergedAssetBundle(string assetBundleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetMergedAssetBundles()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

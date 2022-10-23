@@ -25,6 +25,7 @@ namespace AssetBundleHub.Tasks
                 }
                 File.Delete(destPath);
                 File.Move(srcPath, destPath);
+                context.SetMergedAssetBundle(assetBundleName);
             }
             return UniTask.CompletedTask;
         }
