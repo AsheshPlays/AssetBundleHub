@@ -14,6 +14,11 @@ namespace AssetBundleHub.Tasks
     {
         IFileHashGenerator hashGenerator;
 
+        public ExtractBrokenBundles(IFileHashGenerator hashGenerator)
+        {
+            this.hashGenerator = hashGenerator;
+        }
+
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             // ダウンロード成功したやつリストの取得が必要
