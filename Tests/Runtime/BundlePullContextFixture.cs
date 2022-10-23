@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using AssetBundleHub;
 using Cysharp.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace AssetBundleHubTests
 
     public class BundlePullContextFixture : IBundlePullContext
     {
+        static string testDir = "Test/BundlePullContextFixture";
         public AssetBundleList AssetBundleList { get; set; }
 
         public List<string> AssetBundleNames { get; set; }
@@ -30,18 +32,20 @@ namespace AssetBundleHubTests
         public IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DownloadAsyncDecorators { get; set; }
 
         public Exception Error { get; set; }
-        public string baseUrl = "";
+        public string baseUrl = "https://teach310.github.io/AssetBundlesForDownloadTest/SBP/";
         Dictionary<string, float> downloadProgress = new Dictionary<string, float>();
         public List<string> downloadedAssetBundles = new List<string>();
+        public List<string> tempAssetBundles = new List<string>();
+        public List<string> mergedAssetBundles = new List<string>();
 
         public string GetDestPath(string assetBundleName)
         {
-            return "Test/BundlePullContextFixture/Dest/" + assetBundleName;
+            return testDir + "/Dest/" + assetBundleName;
         }
 
         public string GetTempSavePath(string assetBundleName)
         {
-            return "Test/BundlePullContextFixture/Temp/" + assetBundleName;
+            return testDir + "/Temp/" + assetBundleName;
         }
 
         public string GetURL(string assetBundleName)
@@ -52,6 +56,7 @@ namespace AssetBundleHubTests
         public void SetDownloadedAssetBundle(string assetBundleName)
         {
             downloadedAssetBundles.Add(assetBundleName);
+            tempAssetBundles.Add(assetBundleName);
         }
 
         public void SetDownloadProgress(string assetBundleName, float progress)
@@ -88,22 +93,30 @@ namespace AssetBundleHubTests
 
         public IEnumerable<string> GetTempAssetBundles()
         {
-            throw new NotImplementedException();
+            return tempAssetBundles;
         }
 
         public void ReportBrokenAssetBundle(string assetBundleName)
         {
-            throw new NotImplementedException();
+            tempAssetBundles.Remove(assetBundleName);
         }
 
         public void SetMergedAssetBundle(string assetBundleName)
         {
-            throw new NotImplementedException();
+            mergedAssetBundles.Add(assetBundleName);
         }
 
         public IEnumerable<string> GetMergedAssetBundles()
         {
-            throw new NotImplementedException();
+            return mergedAssetBundles;
+        }
+
+        public static void Clear()
+        {
+            if (Directory.Exists(testDir))
+            {
+                Directory.Delete(testDir, true);
+            }
         }
     }
 }
