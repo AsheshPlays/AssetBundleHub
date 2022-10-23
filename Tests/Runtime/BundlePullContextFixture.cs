@@ -85,5 +85,15 @@ namespace AssetBundleHubTests
                 new MockDownload()
             };
         }
+
+        public IEnumerable<string> GetTempAssetBundles()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReportBrokenAssetBundle(string assetBundleName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
