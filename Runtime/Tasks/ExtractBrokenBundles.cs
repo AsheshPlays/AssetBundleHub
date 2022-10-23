@@ -21,7 +21,6 @@ namespace AssetBundleHub.Tasks
 
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // ダウンロード成功したやつリストの取得が必要
             foreach (var assetBundleName in context.GetTempAssetBundles())
             {
                 string assetBundlePath = context.GetTempSavePath(assetBundleName);
