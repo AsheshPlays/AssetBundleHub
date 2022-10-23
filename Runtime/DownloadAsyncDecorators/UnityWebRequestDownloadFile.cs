@@ -20,13 +20,14 @@ namespace AssetBundleHub
             request.downloadHandler = handler;
 
             using var linkToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            linkToken.CancelAfterSlim(context.Timeout);
+            using var timeoutDisposable = linkToken.CancelAfterSlim(context.Timeout);
 
             try
             {
-                await request.SendWebRequest().ToUniTask(context.Progress, cancellationToken: cancellationToken);
+                // TODO: downloadedBytesをreportするために、ToUniTaskを使わずにwhile(true)で回して待った方がよさそう
+                await request.SendWebRequest().ToUniTask(context.Progress, cancellationToken: linkToken.Token);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException ex) when (ex.CancellationToken == linkToken.Token)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
