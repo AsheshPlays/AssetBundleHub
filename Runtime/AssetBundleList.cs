@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.IO;
 
 namespace AssetBundleHub
 {
@@ -55,6 +56,13 @@ namespace AssetBundleHub
                 depSet.Add(dep);
                 GetDependenciesRecursive(srcAssetBundle, dep, depSet);
             }
+        }
+
+        // TODO: AssetBundleListを暗号化したらこのメソッドは使えないので別メソッドを経由する。
+        public static AssetBundleList LoadFromFile(string path)
+        {
+            string assetBundleListJson = File.ReadAllText(path);
+            return JsonUtility.FromJson<AssetBundleList>(assetBundleListJson);
         }
     }
 
