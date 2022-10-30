@@ -41,45 +41,45 @@ namespace AssetBundleHub
     //     }
     // }
 
-    public class BundleDownloadRequestContext : IBundleDownloadRequestContext
-    {
-        readonly IAssetBundleDownloadParameter downloadParameter;
-        readonly AssetBundleList assetBundleList;
-        int decoratorIndex;
-        readonly IBundleDownloadAsyncDecorator[] decorators;
+    // public class BundleDownloadRequestContext : IBundleDownloadRequestContext
+    // {
+    //     readonly IAssetBundleDownloadParameter downloadParameter;
+    //     readonly AssetBundleList assetBundleList;
+    //     int decoratorIndex;
+    //     readonly IBundleDownloadAsyncDecorator[] decorators;
 
-        public bool Shuffle { get; }
+    //     public bool Shuffle { get; }
 
-        public IDownloadAsyncDecorator<IBundleDownloadRequestContext, IBundleDownloadResponseContext> GetNextDecorator() => decorators[++decoratorIndex];
+    //     public IDownloadAsyncDecorator<IBundleDownloadRequestContext, IBundleDownloadResponseContext> GetNextDecorator() => decorators[++decoratorIndex];
 
-        public BundleDownloadRequestContext(IAssetBundleDownloadParameter downloadParameter, AssetBundleList assetBundleList, IBundleDownloadAsyncDecorator[] decorators, bool shuffle = true)
-        {
-            this.downloadParameter = downloadParameter;
-            this.assetBundleList = assetBundleList;
-            this.decoratorIndex = -1;
-            this.decorators = decorators;
-            Shuffle = shuffle;
-        }
+    //     public BundleDownloadRequestContext(IAssetBundleDownloadParameter downloadParameter, AssetBundleList assetBundleList, IBundleDownloadAsyncDecorator[] decorators, bool shuffle = true)
+    //     {
+    //         this.downloadParameter = downloadParameter;
+    //         this.assetBundleList = assetBundleList;
+    //         this.decoratorIndex = -1;
+    //         this.decorators = decorators;
+    //         Shuffle = shuffle;
+    //     }
 
-        public List<IDownloadRequestContext> CreatePerRequests(IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
-        {
-            var downloadRequests = new List<IDownloadRequestContext>();
-            // foreach (var assetBundleName in downloadParameter.AssetBundleNames)
-            // {
-            //     if (!assetBundleList.Infos.TryGetValue(assetBundleName, out AssetBundleInfo abInfo)){
-            //         throw new Exception($"AssetBundleInfo not found {assetBundleName}");
-            //     }
-            //     // TODO: DownloadSizeとかprogressとかを格納
-            //     downloadRequests.Add(new DownloadRequestContext(
-            //         downloadParameter.GetURL(assetBundleName),
-            //         downloadParameter.GetTempSavePath(assetBundleName),
-            //         TimeSpan.FromSeconds(10f), // TODO
-            //         decorators
-            //     ));
-            // }
-            return downloadRequests;
-        }
-    }
+    //     public List<IDownloadRequestContext> CreatePerRequests(IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
+    //     {
+    //         var downloadRequests = new List<IDownloadRequestContext>();
+    //         // foreach (var assetBundleName in downloadParameter.AssetBundleNames)
+    //         // {
+    //         //     if (!assetBundleList.Infos.TryGetValue(assetBundleName, out AssetBundleInfo abInfo)){
+    //         //         throw new Exception($"AssetBundleInfo not found {assetBundleName}");
+    //         //     }
+    //         //     // TODO: DownloadSizeとかprogressとかを格納
+    //         //     downloadRequests.Add(new DownloadRequestContext(
+    //         //         downloadParameter.GetURL(assetBundleName),
+    //         //         downloadParameter.GetTempSavePath(assetBundleName),
+    //         //         TimeSpan.FromSeconds(10f), // TODO
+    //         //         decorators
+    //         //     ));
+    //         // }
+    //         return downloadRequests;
+    //     }
+    // }
 
 
     public interface IBundleDownloadResponseContext
