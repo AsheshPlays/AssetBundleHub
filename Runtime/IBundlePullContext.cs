@@ -48,7 +48,7 @@ namespace AssetBundleHub
 
         public TimeSpan Timeout { get; set; }
 
-        public IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DownloadAsyncDecorators => throw new NotImplementedException();
+        public IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DownloadAsyncDecorators { get; set; }
 
         public Exception Error { get; set; } = null;
 
@@ -60,10 +60,11 @@ namespace AssetBundleHub
         List<string> tempAssetBundles = new List<string>();
         List<string> mergedAssetBundles = new List<string>();
 
-        public BundlePullContext(AssetBundleHubSettings settings)
+        public BundlePullContext(AssetBundleHubSettings settings, params IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
         {
             this.settings = settings;
             Timeout = settings.Timeout;
+            DownloadAsyncDecorators = decorators.Length != 0 ? decorators : DefaultDecorators();
         }
 
         public string GetURL(string assetBundleName)
@@ -90,7 +91,7 @@ namespace AssetBundleHub
 
         public string GetDestPath(string assetBundleName)
         {
-            // TODO: ロード時にも使うパスなのでこの取得は共通化する
+            // TODO: ロード時やAssetBundleListにも使うパスなのでこの取得は共通化する
             return Path.Combine(settings.SaveDataPath, assetBundleName);
         }
 
@@ -119,6 +120,15 @@ namespace AssetBundleHub
         public IEnumerable<string> GetMergedAssetBundles()
         {
             return mergedAssetBundles;
+        }
+
+        static IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DefaultDecorators()
+        {
+            return new IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]
+            {
+                new QueueRequestDecorator(runCapacity: 4),
+                new UnityWebRequestDownloadFile()
+            };
         }
     }
 }
