@@ -23,11 +23,15 @@ namespace AssetBundleHub
         public int timeoutSec = 30;
         public string baseUrl;
 
-        string tempSavePath;
+        public string tempSavePath;
         public string TempSavePath => tempSavePath;
-        string saveDataPath;
+        public string saveDataPath;
         public string SaveDataPath => saveDataPath;
         // TODO: BuiltinAssetのパス
+
+        // AssetBundleListの方針が見えていないのでとりあえず外だししておいている。
+        public string assetBundleListUrl;
+        public string assetBundleListName;
 
         public TimeSpan Timeout => TimeSpan.FromSeconds(timeoutSec);
 
@@ -53,6 +57,10 @@ namespace AssetBundleHub
 
         public static void Load()
         {
+            if(instance != null)
+            {
+                return;
+            }
 #if UNITY_EDITOR
             instance = EditorSettings();
 #else
