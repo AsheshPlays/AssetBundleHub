@@ -120,6 +120,26 @@ namespace AssetBundleHub
             this.Progress = progress;
             this.Timeout = timeout;
         }
+
+        public static DownloadRequestContext Create(string url, string savePath, TimeSpan timeout, IProgress<float> progress = null, params IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
+        {
+            return new DownloadRequestContext(
+                url,
+                savePath,
+                timeout,
+                progress,
+                decorators.Length != 0 ? decorators : DefaultDecorators()
+            );
+        }
+
+        static IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DefaultDecorators()
+        {
+            return new IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]
+            {
+                new QueueRequestDecorator(runCapacity: 4),
+                new UnityWebRequestDownloadFile()
+            };
+        }
     }
 
     public interface IDownloadResponseContext

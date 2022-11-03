@@ -24,11 +24,44 @@ namespace AssetBundleHub
         // key: AssetPath value: assetBundleName
         ReadOnlyDictionary<string, string> assetPathToAssetBundleMap;
 
-        IAssetBundlePath assetBundlePath;
-        string assetBundleListPath => assetBundlePath.GetAssetBundleListPath();
+        string assetBundleListPath
+        {
+            get
+            {
+                var settings = AssetBundleHubSettings.Instance;
+                return Path.Combine(settings.SaveDataPath, settings.assetBundleListName);
+            }
+        }
         public AssetBundleInfo GetAssetBundleInfo(string assetBundleName) => assetBundleList.Infos[assetBundleName];
         public List<string> GetAllDependencies(string assetBundleName) => assetBundleList.GetAllDependencies(assetBundleName);
         public bool TryGetAssetBundleName(string assetPath, out string assetBundleName) => assetPathToAssetBundleMap.TryGetValue(assetPath, out assetBundleName);
+
+        public bool ExistsAssetBundleList() => File.Exists(assetBundleListPath);
+        public async UniTask PullAssetBundleList(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // TODO: refactor
+            var settings = AssetBundleHubSettings.Instance;
+            if (!Directory.Exists(settings.TempSavePath))
+            {
+                Directory.CreateDirectory(settings.TempSavePath);
+            }
+
+            var tempPath = Path.Combine(settings.TempSavePath, settings.assetBundleListName);
+            var destPath = Path.Combine(settings.SaveDataPath, settings.assetBundleListName);
+            var request = DownloadRequestContext.Create(
+                settings.assetBundleListUrl,
+                tempPath,
+                settings.Timeout
+            );
+            IFileDownloader fileDownloader = new FileDownloader();
+            await fileDownloader.Run(request, cancellationToken);
+            if (!Directory.Exists(settings.SaveDataPath))
+            {
+                Directory.CreateDirectory(settings.SaveDataPath);
+            }
+            File.Delete(destPath);
+            File.Move(tempPath, destPath);
+        }
 
         /// <summary>
         /// AssetBundleListをロード。初期化時に呼ぶ必要がある。
