@@ -21,8 +21,8 @@ namespace AssetBundleHub
     {
         ILocalAssetBundleTable localAssetBundleTable;
         AssetBundleList assetBundleList;
-        // key: AssetPath value: assetBundleName
-        ReadOnlyDictionary<string, string> assetPathToAssetBundleMap;
+        // key: assetName value: assetBundleName
+        ReadOnlyDictionary<string, string> assetNameToAssetBundleMap;
 
         string assetBundleListPath
         {
@@ -34,7 +34,7 @@ namespace AssetBundleHub
         }
         public AssetBundleInfo GetAssetBundleInfo(string assetBundleName) => assetBundleList.Infos[assetBundleName];
         public List<string> GetAllDependencies(string assetBundleName) => assetBundleList.GetAllDependencies(assetBundleName);
-        public bool TryGetAssetBundleName(string assetPath, out string assetBundleName) => assetPathToAssetBundleMap.TryGetValue(assetPath, out assetBundleName);
+        public bool TryGetAssetBundleName(string assetName, out string assetBundleName) => assetNameToAssetBundleMap.TryGetValue(assetName, out assetBundleName);
 
         public bool ExistsAssetBundleList() => File.Exists(assetBundleListPath);
         public async UniTask PullAssetBundleList(CancellationToken cancellationToken = default(CancellationToken))
@@ -85,7 +85,7 @@ namespace AssetBundleHub
                 }
             }
 
-            assetPathToAssetBundleMap = new ReadOnlyDictionary<string, string>(assetToAssetBundleMap);
+            assetNameToAssetBundleMap = new ReadOnlyDictionary<string, string>(assetToAssetBundleMap);
         }
 
         public bool ExistsNewRelease(string assetBundleName)

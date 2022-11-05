@@ -33,7 +33,7 @@ namespace AssetBundleHub
 
     public interface IDownloadAssetBundleInfoStore
     {
-        bool TryGetAssetBundleName(string assetPath, out string assetBundleName);
+        bool TryGetAssetBundleName(string assetName, out string assetBundleName);
         List<string> GetAllDependencies(string assetBundleName);
         bool ExistsNewRelease(string assetBundleName); // ダウンロードが必要ならtrueを返す
         AssetBundleInfo GetAssetBundleInfo(string assetBundleName);
@@ -83,8 +83,8 @@ namespace AssetBundleHub
         /// ダウンロード対象となるassetのパスを追加
         /// 状態がリセットされる。
         /// </summary>
-        /// <param name="assetPaths"></param>
-        public void SetDownloadTarget(List<string> assetPaths)
+        /// <param name="assetNames">ビルド時に設定したaddressableNameのリスト</param>
+        public void SetDownloadTarget(List<string> assetNames)
         {
             if (State == DownloadState.Running)
             {
@@ -92,7 +92,7 @@ namespace AssetBundleHub
             }
             State = DownloadState.Idle;
             DownloadProgress = 0f;
-            initialTartetAssetBundles = GetAssetBundleNameSet(assetPaths).Select(x => assetBundleInfoStore.GetAssetBundleInfo(x)).ToList();
+            initialTartetAssetBundles = GetAssetBundleNameSet(assetNames).Select(x => assetBundleInfoStore.GetAssetBundleInfo(x)).ToList();
             DownloadSize = SumSize(initialTartetAssetBundles);
         }
 
@@ -129,15 +129,15 @@ namespace AssetBundleHub
             return result;
         }
 
-        HashSet<string> GetAssetBundleNameSet(List<string> assetPaths)
+        HashSet<string> GetAssetBundleNameSet(List<string> assetNames)
         {
             var assetBundleNameSet = new HashSet<string>();
 
-            foreach (var assetPath in assetPaths)
+            foreach (var assetName in assetNames)
             {
-                if (!assetBundleInfoStore.TryGetAssetBundleName(assetPath, out var abName))
+                if (!assetBundleInfoStore.TryGetAssetBundleName(assetName, out var abName))
                 {
-                    throw new Exception($"AssetBundle not found asset {assetPath}");
+                    throw new Exception($"AssetBundle not found asset {assetName}");
                 }
 
                 assetBundleNameSet.Add(abName);

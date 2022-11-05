@@ -23,7 +23,7 @@ namespace AssetBundleHubTests
             }
 
             public Dictionary<string, Data> dataMap = new Dictionary<string, Data>();
-            // key: assetPath, value: assetBundleName
+            // key: assetName, value: assetBundleName
             public Dictionary<string, string> assetMap = new Dictionary<string, string>();
 
             public bool ExistsNewRelease(string assetBundleName)
@@ -41,9 +41,9 @@ namespace AssetBundleHubTests
                 return dataMap[assetBundleName].assetBundleInfo;
             }
 
-            public bool TryGetAssetBundleName(string assetPath, out string assetBundleName)
+            public bool TryGetAssetBundleName(string assetName, out string assetBundleName)
             {
-                return assetMap.TryGetValue(assetPath, out assetBundleName);
+                return assetMap.TryGetValue(assetName, out assetBundleName);
             }
         }
 
