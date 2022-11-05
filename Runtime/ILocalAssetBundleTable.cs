@@ -4,21 +4,21 @@ using UnityEngine;
 
 namespace AssetBundleHub
 {
-    public interface IUserAssetBundle
+    public interface ILocalAssetBundle
     {
         string Name { get; } // AssetBundle識別用の名前
         string Hash { get; } // Version管理用のHash
     }
 
-    public interface IReadonlyUserAssetBundleTable
+    public interface IReadonlyLocalAssetBundleTable
     {
         bool Contains(string assetBundleName);
         bool TryGetHash(string assetBundleName, out string hash);
-        //bool TryGetValue(string assetBundleName, out IUserAssetBundle userAssetBundle);
+        //bool TryGetValue(string assetBundleName, out ILocalAssetBundle localAssetBundle);
     }
 
-    public interface IUserAssetBundleTable : IReadonlyUserAssetBundleTable
+    public interface ILocalAssetBundleTable : IReadonlyLocalAssetBundleTable
     {
-        void BulkSet(List<IUserAssetBundle> values); // まとめてSetして書き込む
+        void BulkSet(List<ILocalAssetBundle> values); // まとめてSetして書き込む
     }
 }

@@ -19,7 +19,7 @@ namespace AssetBundleHub
     /// </summary>
     public class AssetBundleLocalRepository : IDownloadAssetBundleInfoStore, IPullAssetBundles
     {
-        IUserAssetBundleTable userAssetBundleTable;
+        ILocalAssetBundleTable localAssetBundleTable;
         AssetBundleList assetBundleList;
         // key: AssetPath value: assetBundleName
         ReadOnlyDictionary<string, string> assetPathToAssetBundleMap;
@@ -98,13 +98,13 @@ namespace AssetBundleHub
             }
 
             // ローカルに対象のファイルが存在してなければ新規
-            if (!userAssetBundleTable.TryGetHash(assetBundleName, out string userAssetBundleHash))
+            if (!localAssetBundleTable.TryGetHash(assetBundleName, out string localAssetBundleHash))
             {
                 return true;
             }
 
             // ローカルのAssetBundleのバージョンが古かったら新規
-            if (assetBundleInfo.Hash != userAssetBundleHash)
+            if (assetBundleInfo.Hash != localAssetBundleHash)
             {
                 return true;
             }

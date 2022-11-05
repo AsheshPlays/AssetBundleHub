@@ -16,7 +16,7 @@ namespace AssetBundleHub.Tasks
             var fetchBundles = new FetchBundles();
             var extractBrokenBundles = new ExtractBrokenBundles(new MD5FileHashGenerator());
             var mergeBundles = new MergeBundles();
-            // TODO: UserAssetBundleTableへの格納
+            // TODO: LocalAssetBundleTableへの格納
             await fetchBundles.Run(context, cancellationToken);
             await extractBrokenBundles.Run(context, cancellationToken);
             await mergeBundles.Run(context, cancellationToken);
