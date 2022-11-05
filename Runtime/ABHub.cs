@@ -29,7 +29,6 @@ namespace AssetBundleHub
             instance.localRepository.LoadAndCacheAssetBundleList();
         }
 
-
         public static AssetBundleDownloader CreateDownloader()
         {
             IDownloadAssetBundleInfoStore assetBundleInfoStore = instance.localRepository;

@@ -33,7 +33,8 @@ namespace AssetBundleHubTests
             var context = BundlePullContextFixture.Load();
             context.AssetBundleNames = assetBundleNames;
             using var cts = new CancellationTokenSource();
-            UniTask.Create(async () => {
+            UniTask.Create(async () =>
+            {
                 await UniTask.DelayFrame(2);
                 cts.Cancel();
             }).Forget();

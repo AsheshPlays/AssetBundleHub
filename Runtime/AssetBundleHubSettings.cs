@@ -57,7 +57,7 @@ namespace AssetBundleHub
 
         public static void Load()
         {
-            if(instance != null)
+            if (instance != null)
             {
                 return;
             }

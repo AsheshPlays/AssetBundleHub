@@ -78,7 +78,7 @@ namespace AssetBundleHub
 
         public string GetTempSavePath(string assetBundleName)
         {
-            if(!tempSavePathMap.TryGetValue(assetBundleName, out var tempPath))
+            if (!tempSavePathMap.TryGetValue(assetBundleName, out var tempPath))
             {
                 // https://learn.microsoft.com/en-us/dotnet/api/system.guid.tostring?view=net-7.0
                 // ハイフンを含まない32字

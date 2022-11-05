@@ -65,7 +65,7 @@ namespace AssetBundleHub
                 RunningCount++;
 
                 // 呼び出し側のresponseに対する処理を先に実行したほうが自然なので、1フレーム待つ。
-                if(waitFlag)
+                if (waitFlag)
                 {
                     await UniTask.Yield();
                     waitFlag = false;
