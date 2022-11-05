@@ -11,7 +11,7 @@ namespace AssetBundleHubTests
         {
             AssetBundleHubSettings.Load();
             var settings = AssetBundleHubSettings.Instance;
-            settings.baseUrl = "https://teach310.github.io/AssetBundlesForDownloadTest/SBP/";
+            settings.baseUrl = "https://teach310.github.io/AssetBundleHubSample/AssetBundles/StandaloneOSX/";
             settings.tempSavePath = Utils.testDir + "/Temp";
             settings.saveDataPath = Utils.testDir + "/SaveData";
             string assetBundleListName = "AssetBundleList.json";

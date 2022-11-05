@@ -55,13 +55,15 @@ namespace AssetBundleHubTests
             }
         }
 
+#if ABHUB_SKIP_DL_TEST
         [Ignore("ダウンロード先に依存するので基本はスキップ")]
+#endif
         [UnityTest]
         public IEnumerator 正常系_DownloadAsync() => UniTask.ToCoroutine(async () =>
         {
             var context = new MockRequestContext()
             {
-                URL = "https://teach310.github.io/AssetBundlesForDownloadTest/SBP/Prefabs001", // TODO AssetBundleSampleに変更
+                URL = "https://teach310.github.io/AssetBundleHubSample/AssetBundles/StandaloneOSX/Prefabs001",
                 SavePath = testDir + "/Prefabs001"
             };
 

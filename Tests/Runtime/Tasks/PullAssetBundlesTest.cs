@@ -26,7 +26,9 @@ namespace AssetBundleHubTests
             BundlePullContextFixture.Clear();
         }
 
+#if ABHUB_SKIP_DL_TEST
         [Ignore("ダウンロード先に依存するので基本はスキップ")]
+#endif
         [UnityTest]
         public IEnumerator 正常系_Run() => UniTask.ToCoroutine(async () =>
         {

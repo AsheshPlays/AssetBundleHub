@@ -32,7 +32,7 @@ namespace AssetBundleHubTests
         public IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DownloadAsyncDecorators { get; set; }
 
         public Exception Error { get; set; }
-        public string baseUrl = "https://teach310.github.io/AssetBundlesForDownloadTest/SBP/";
+        public string baseUrl = "https://teach310.github.io/AssetBundleHubSample/AssetBundles/StandaloneOSX/";
         Dictionary<string, float> downloadProgress = new Dictionary<string, float>();
         public List<string> downloadedAssetBundles = new List<string>();
         public List<string> tempAssetBundles = new List<string>();
