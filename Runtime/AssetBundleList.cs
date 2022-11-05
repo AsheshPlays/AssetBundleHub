@@ -85,8 +85,9 @@ namespace AssetBundleHub
         [SerializeField] List<string> directDependencies;
         public List<string> DirectDependencies => directDependencies;
 
+        // NOTE: プロジェクト直下Assetsからのパスではなく、ビルド時に設定したaddressableNameが格納されている。
         [SerializeField] List<string> assetNames;
-        public List<string> AssetNames => assetNames; // Assetのパス。シーンのパスも分けずにここに入れる。
+        public List<string> AssetNames => assetNames;
 
         public AssetBundleInfo(string name, string hash, string fileHash, int size, List<string> directDependencies, List<string> assetNames)
         {
