@@ -67,7 +67,7 @@ namespace AssetBundleHub
         public DownloadState State { get; private set; } = DownloadState.Idle;
         public ulong DownloadSize { get; private set; } = 0L; // 合計DLサイズ 単位はbytes
         public ulong DownloadedSize { get; private set; } = 0L; // ダウンロードされたサイズ
-        public float DownloadProgress { get; private set; } = 0L; // DownloadedSize / DownloadSize
+        public float DownloadProgress { get; private set; } = 0f; // DownloadedSize / DownloadSize
         Action<ulong> downloadedBytesHandler = null;
 
         IDownloadAssetBundleInfoStore assetBundleInfoStore;
