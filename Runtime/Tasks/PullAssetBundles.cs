@@ -17,7 +17,7 @@ namespace AssetBundleHub.Tasks
             var extractBrokenBundles = new ExtractBrokenBundles(new MD5FileHashGenerator());
             var mergeBundles = new MergeBundles();
             var updateLocalAssetBundleTable = new UpdateLocalAssetBundleTable();
-            var localAssetBundleTable = ServiceLocator.instance.Resolve<ILocalAssetBundleTable>();
+            var localAssetBundleTable = ServiceLocator.Instance.Resolve<ILocalAssetBundleTable>();
             await fetchBundles.Run(context, cancellationToken);
             await extractBrokenBundles.Run(context, cancellationToken);
             await mergeBundles.Run(context, cancellationToken);

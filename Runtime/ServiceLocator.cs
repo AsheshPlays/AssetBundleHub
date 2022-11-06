@@ -9,7 +9,7 @@ namespace AssetBundleHub
     // しかし、Initializeで使わないインスタンスはInitializeより後にRegisterしても無駄なく動くようにするために、Resolve時にDefaultのCreateを呼ぶ。
     public class ServiceLocator
     {
-        public readonly static ServiceLocator instance = new ServiceLocator(new Dictionary<Type, Func<object>>()
+        public static ServiceLocator Instance { get; private set; } = new ServiceLocator(new Dictionary<Type, Func<object>>()
             {
                 { typeof(ILocalAssetBundleTable), LocalAssetBundleTable.Create }
             }

@@ -25,7 +25,7 @@ namespace AssetBundleHubTests
         public void TearDown()
         {
             BundlePullContextFixture.Clear();
-            ServiceLocator.instance.Clear();
+            ServiceLocator.Instance.Clear();
         }
 
 #if ABHUB_SKIP_DL_TEST

@@ -17,7 +17,7 @@ namespace AssetBundleHub
             instance = new ABHub();
             // SettingsがLoadされていなければここで読み込むが、上書きする場合には事前にLoadしておくこと。
             AssetBundleHubSettings.Load();
-            var localAssetBundleTable = ServiceLocator.instance.Resolve<ILocalAssetBundleTable>();
+            var localAssetBundleTable = ServiceLocator.Instance.Resolve<ILocalAssetBundleTable>();
             instance.localRepository = new AssetBundleLocalRepository(localAssetBundleTable);
         }
 

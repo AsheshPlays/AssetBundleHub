@@ -18,7 +18,7 @@ namespace AssetBundleHub
                 var abInfo = context.AssetBundleList.Infos[assetBundleName];
                 values[assetBundleName] = abInfo.Hash;
             }
-            var localAssetBundleTable = ServiceLocator.instance.Resolve<ILocalAssetBundleTable>();
+            var localAssetBundleTable = ServiceLocator.Instance.Resolve<ILocalAssetBundleTable>();
             localAssetBundleTable.BulkSet(values);
             return UniTask.CompletedTask;
         }

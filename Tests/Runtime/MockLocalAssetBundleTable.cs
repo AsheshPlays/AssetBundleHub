@@ -31,7 +31,7 @@ namespace AssetBundleHubTests
         public static MockLocalAssetBundleTable Register()
         {
             var mock = new MockLocalAssetBundleTable();
-            ServiceLocator.instance.Register<ILocalAssetBundleTable>(mock);
+            ServiceLocator.Instance.Register<ILocalAssetBundleTable>(mock);
             return mock;
         }
     }
