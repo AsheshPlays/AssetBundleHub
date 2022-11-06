@@ -14,6 +14,7 @@ namespace AssetBundleHubTests
             settings.baseUrl = "https://teach310.github.io/AssetBundleHubSample/AssetBundles/StandaloneOSX/";
             settings.tempSavePath = Utils.testDir + "/Temp";
             settings.saveDataPath = Utils.testDir + "/SaveData";
+            settings.localAssetBundleTablePath = Utils.testDir + "/SaveData/LocalAssetBundleTable.json";
             string assetBundleListName = "AssetBundleList.json";
             settings.assetBundleListUrl = settings.baseUrl + assetBundleListName;
             settings.assetBundleListName = assetBundleListName;

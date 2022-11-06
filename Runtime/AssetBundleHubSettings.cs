@@ -13,7 +13,7 @@ namespace AssetBundleHub
             {
                 if (instance == null)
                 {
-                    throw new Exception("AssetBundleHubSettings id not loaded");
+                    throw new Exception("AssetBundleHubSettings is not loaded");
                 }
                 return instance;
             }
@@ -33,6 +33,8 @@ namespace AssetBundleHub
         public string assetBundleListUrl;
         public string assetBundleListName;
 
+        public string localAssetBundleTablePath;
+
         public TimeSpan Timeout => TimeSpan.FromSeconds(timeoutSec);
 
         static AssetBundleHubSettings EditorSettings()
@@ -40,10 +42,12 @@ namespace AssetBundleHub
             return new AssetBundleHubSettings()
             {
                 tempSavePath = "Temp/AB",
-                saveDataPath = "SaveData/AB"
+                saveDataPath = "SaveData/AB",
+                localAssetBundleTablePath = "SaveData/AB/LocalAssetBundleTable.json"
             };
         }
 
+        // Default。ABHubのInitialize前なら差し替え可
         // TODO: iosでBackup対象からはずすこと
         // https://light11.hatenadiary.com/entry/2019/10/07/031405
         static AssetBundleHubSettings AppSettings()
@@ -51,7 +55,8 @@ namespace AssetBundleHub
             return new AssetBundleHubSettings()
             {
                 tempSavePath = Application.temporaryCachePath + "/AB",
-                saveDataPath = Application.persistentDataPath + "/AB"
+                saveDataPath = Application.persistentDataPath + "/AB",
+                localAssetBundleTablePath = Application.persistentDataPath + "/AB/LocalAssetBundleTable.json"
             };
         }
 
