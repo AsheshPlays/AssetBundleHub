@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -31,20 +32,6 @@ namespace AssetBundleHub
         }
     }
 
-    public interface IDownloadAssetBundleInfoStore
-    {
-        bool TryGetAssetBundleName(string assetName, out string assetBundleName);
-        List<string> GetAllDependencies(string assetBundleName);
-        bool ExistsNewRelease(string assetBundleName); // ダウンロードが必要ならtrueを返す
-        AssetBundleInfo GetAssetBundleInfo(string assetBundleName);
-    }
-
-    public interface IPullAssetBundles
-    {
-        // TODO CancellationTokenを渡すことを検討
-        UniTask PullAssetBundles(IList<string> assetBundleNames, Action<ulong> reportDownloadedBytes = null);
-    }
-
     /// <summary>
     /// AssetBundleをダウンロードするクラス。
     /// ダウンロード進捗を状態としてもつ。
@@ -66,9 +53,9 @@ namespace AssetBundleHub
 
         public DownloadState State { get; private set; } = DownloadState.Idle;
         public ulong DownloadSize { get; private set; } = 0L; // 合計DLサイズ 単位はbytes
-        public ulong DownloadedSize { get; private set; } = 0L; // ダウンロードされたサイズ
-        public float DownloadProgress { get; private set; } = 0f; // DownloadedSize / DownloadSize
-        Action<ulong> downloadedBytesHandler = null;
+        float startProgress = 0f; // DownloadAsyncを呼んだ時点のprogress。リトライ時にはStart時点で0以上
+        IBundlePullOutputProgress pullOutputProgress;
+
 
         IDownloadAssetBundleInfoStore assetBundleInfoStore;
         IPullAssetBundles repository;
@@ -91,12 +78,12 @@ namespace AssetBundleHub
                 throw new Exception("AssetBundleDownloader is running");
             }
             State = DownloadState.Idle;
-            DownloadProgress = 0f;
-            initialTartetAssetBundles = GetAssetBundleNameSet(assetNames).Select(x => assetBundleInfoStore.GetAssetBundleInfo(x)).ToList();
+            pullOutputProgress = null;
+            initialTartetAssetBundles = GetAssetBundleNameSet(assetNames).Select(x => assetBundleInfoStore.AssetBundleList.Infos[x]).ToList();
             DownloadSize = SumSize(initialTartetAssetBundles);
         }
 
-        public async UniTask<AssetBundleDownloadResult> DownloadAsync()
+        public async UniTask<AssetBundleDownloadResult> DownloadAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!IsDownloadableState())
             {
@@ -109,15 +96,18 @@ namespace AssetBundleHub
             // 対象がなければ即返す
             if (latestTargetAssetBundles.Count == 0)
             {
-                DownloadProgress = 1.0f;
                 State = DownloadState.Completed;
                 return new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.Success);
             }
 
+            var context = new BundlePullContext();
+            pullOutputProgress = context;
+            context.AssetBundleList = assetBundleInfoStore.AssetBundleList;
+            context.AssetBundleNames = latestTargetAssetBundles.Select(x => x.Name).ToList();
             try
             {
                 State = DownloadState.Running;
-                await repository.PullAssetBundles(latestTargetAssetBundles.Select(x => x.Name).ToList(), downloadedBytesHandler);
+                await repository.PullAssetBundles(context, cancellationToken);
                 result = new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.Success);
                 State = DownloadState.Completed;
             }
@@ -143,7 +133,7 @@ namespace AssetBundleHub
                 assetBundleNameSet.Add(abName);
 
                 // 依存関係のあるAssetBundleもダウンロード対象
-                var allDeps = assetBundleInfoStore.GetAllDependencies(abName);
+                var allDeps = assetBundleInfoStore.AssetBundleList.GetAllDependencies(abName);
                 foreach (var dep in allDeps)
                 {
                     assetBundleNameSet.Add(dep);
@@ -180,17 +170,18 @@ namespace AssetBundleHub
                 }
             }
             latestTargetAssetBundles = target;
-            downloadedBytesHandler = CreateDownloadedBytesHandler(downloadedSize);
-            downloadedBytesHandler(0L);
+            startProgress = Mathf.Clamp01((float)(downloadedSize / (double)DownloadSize));
         }
 
-        Action<ulong> CreateDownloadedBytesHandler(ulong startDownloadedSize)
+        // 計算量を少なくするために必要なときにだけ進捗を取得するようにする。
+        public float CalcProgress()
         {
-            return new Action<ulong>(bytes =>
+            if(pullOutputProgress == null)
             {
-                DownloadedSize = startDownloadedSize + bytes;
-                DownloadProgress = Mathf.Clamp01(DownloadedSize / DownloadSize);
-            });
+                return startProgress;
+            }
+
+            return Mathf.Lerp(startProgress, 1.0f, pullOutputProgress.CalcProgress());
         }
     }
 }

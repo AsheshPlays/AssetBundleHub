@@ -53,8 +53,9 @@ namespace AssetBundleHubTests
             var downloader = ABHub.CreateDownloader();
             downloader.SetDownloadTarget(downloadAssetNames);
             Assert.That(downloader.DownloadSize, Is.EqualTo(expectedDownloadSize));
-            Assert.That(downloader.DownloadProgress, Is.EqualTo(0));
+            Assert.That(downloader.CalcProgress, Is.EqualTo(0));
             var result = await downloader.DownloadAsync();
+            Assert.That(downloader.CalcProgress, Is.EqualTo(1.0f));
             Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Success));
         });
     }

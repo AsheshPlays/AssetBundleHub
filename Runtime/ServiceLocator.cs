@@ -11,7 +11,8 @@ namespace AssetBundleHub
     {
         public static ServiceLocator Instance { get; private set; } = new ServiceLocator(new Dictionary<Type, Func<object>>()
             {
-                { typeof(ILocalAssetBundleTable), LocalAssetBundleTable.Create }
+                { typeof(ILocalAssetBundleTable), LocalAssetBundleTable.Create },
+                { typeof(IAssetBundleListLoader), AssetBundleListLoader.Create }
             }
         );
 

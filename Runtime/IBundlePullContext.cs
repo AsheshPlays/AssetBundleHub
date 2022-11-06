@@ -6,12 +6,22 @@ using UnityEngine;
 
 namespace AssetBundleHub
 {
+    // NOTE: 実際にダウンロードしたbytesではなく、Progressから算出する。
+    // 実際にダウンロードしたbytesで加算していったほうが計算は軽いが、
+    // AssetBundleListのsizeと実際のダウンロードしたサイズがずれていた場合に挙動おかしくなるため。
+    // (起こりうるケースに心当たりがあるわけではない)
+    public interface IBundlePullOutputProgress
+    {
+        float CalcProgress();
+    }
+
     // Pullの一連の流れの途中経過を全てここに入れる
-    public interface IBundlePullContext
+    public interface IBundlePullContext : IBundlePullOutputProgress
     {
         // Input
-        AssetBundleList AssetBundleList { get; }
         List<string> AssetBundleNames { get; }
+        AssetBundleList AssetBundleList { get; }
+
         string GetURL(string assetBundleName);
         string GetTempSavePath(string assetBundleName);
         string GetDestPath(string assetBundleName);
@@ -60,9 +70,9 @@ namespace AssetBundleHub
         List<string> tempAssetBundles = new List<string>();
         List<string> mergedAssetBundles = new List<string>();
 
-        public BundlePullContext(AssetBundleHubSettings settings, params IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
+        public BundlePullContext(params IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
         {
-            this.settings = settings;
+            this.settings = AssetBundleHubSettings.Instance;
             Timeout = settings.Timeout;
             DownloadAsyncDecorators = decorators.Length != 0 ? decorators : DefaultDecorators();
         }
@@ -98,6 +108,32 @@ namespace AssetBundleHub
         public void SetDownloadProgress(string assetBundleName, float progress)
         {
             downloadProgress[assetBundleName] = progress;
+        }
+
+        public float CalcProgress()
+        {
+            ulong downloadSize = 0L;
+            ulong downloadedSize = 0L;
+
+            foreach (var kvp in downloadProgress)
+            {
+                var abSize = AssetBundleList.Infos[kvp.Key].Size;
+                var progress = kvp.Value;
+                downloadSize += (ulong)abSize;
+
+                if (Mathf.Approximately(progress, 1.0f))
+                {
+                    // ダウンロード済みなら計算を省略
+                    downloadedSize += (ulong)abSize;
+                }
+                else if (progress > 0f)
+                {
+                    // floatだとint最大値のときにはみ出すので8byteのdoubleを使用
+                    downloadedSize += (ulong)(abSize * (double)progress);
+                }
+            }
+
+            return Mathf.Clamp01((float)(downloadedSize / (double)downloadSize));
         }
 
         public void SetDownloadedAssetBundle(string assetBundleName)

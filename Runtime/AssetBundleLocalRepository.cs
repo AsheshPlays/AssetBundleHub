@@ -11,6 +11,18 @@ using UnityEngine;
 
 namespace AssetBundleHub
 {
+    public interface IDownloadAssetBundleInfoStore
+    {
+        AssetBundleList AssetBundleList { get; }
+        bool TryGetAssetBundleName(string assetName, out string assetBundleName);
+        bool ExistsNewRelease(string assetBundleName); // ダウンロードが必要ならtrueを返す
+    }
+
+    public interface IPullAssetBundles
+    {
+        UniTask PullAssetBundles(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken));
+    }
+
     /// <summary>
     /// gitのLocalRepositoryをイメージしたクラス。
     /// ローカルのAssetBundleや状態を管理する。
@@ -21,6 +33,8 @@ namespace AssetBundleHub
     {
         ILocalAssetBundleTable localAssetBundleTable;
         AssetBundleList assetBundleList;
+        public AssetBundleList AssetBundleList => assetBundleList;
+
         // key: assetName value: assetBundleName
         ReadOnlyDictionary<string, string> assetNameToAssetBundleMap;
 
@@ -37,8 +51,7 @@ namespace AssetBundleHub
                 return Path.Combine(settings.SaveDataPath, settings.assetBundleListName);
             }
         }
-        public AssetBundleInfo GetAssetBundleInfo(string assetBundleName) => assetBundleList.Infos[assetBundleName];
-        public List<string> GetAllDependencies(string assetBundleName) => assetBundleList.GetAllDependencies(assetBundleName);
+
         public bool TryGetAssetBundleName(string assetName, out string assetBundleName) => assetNameToAssetBundleMap.TryGetValue(assetName, out assetBundleName);
 
         public bool ExistsAssetBundleList() => File.Exists(assetBundleListPath);
@@ -73,7 +86,8 @@ namespace AssetBundleHub
         /// </summary>
         public void LoadAndCacheAssetBundleList()
         {
-            assetBundleList = AssetBundleList.LoadFromFile(assetBundleListPath); // TODO AssetBundleListが暗号化されることを考慮
+            var assetBundleListLoader = ServiceLocator.Instance.Resolve<IAssetBundleListLoader>();
+            assetBundleList = assetBundleListLoader.Load(assetBundleListPath);
             // Assetのフルパス : AssetBundle名のmapを作ってキャッシュ
             var assetToAssetBundleMap = new Dictionary<string, string>();
             foreach (var kvp in assetBundleList.Infos)
@@ -116,20 +130,15 @@ namespace AssetBundleHub
             return false;
         }
 
-        public async UniTask PullAssetBundles(IList<string> assetBundleNames, Action<ulong> reportDownloadedBytes = null)
+        public async UniTask PullAssetBundles(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (assetBundleList == null)
+            if (context.AssetBundleNames == null || context.AssetBundleNames.Count == 0)
             {
-                throw new Exception("assetBundleList is null.");
+                return;
             }
 
-            var bundlePullContext = new BundlePullContext(AssetBundleHubSettings.Instance);
-            bundlePullContext.AssetBundleList = assetBundleList;
-            bundlePullContext.AssetBundleNames = assetBundleNames.ToList();
-            // TODO: reportDownloadedBytesの実装
             var pullAssetBundles = new PullAssetBundles();
-            using var cts = new CancellationTokenSource(); // TODO: より上流から伝搬
-            await pullAssetBundles.Run(bundlePullContext, cts.Token);
+            await pullAssetBundles.Run(context, cancellationToken);
         }
     }
 }

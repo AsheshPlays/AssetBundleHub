@@ -64,6 +64,32 @@ namespace AssetBundleHubTests
             downloadProgress[assetBundleName] = progress;
         }
 
+        public float CalcProgress()
+        {
+            ulong downloadSize = 0L;
+            ulong downloadedSize = 0L;
+
+            foreach (var kvp in downloadProgress)
+            {
+                var abSize = AssetBundleList.Infos[kvp.Key].Size;
+                var progress = kvp.Value;
+                downloadSize += (ulong)abSize;
+
+                if (Mathf.Approximately(progress, 1.0f))
+                {
+                    // ダウンロード済みなら計算を省略
+                    downloadedSize += (ulong)abSize;
+                }
+                else if (progress > 0f)
+                {
+                    // floatだとint最大値のときにはみ出すので8byteのdoubleを使用
+                    downloadedSize += (ulong)(abSize * (double)progress);
+                }
+            }
+
+            return Mathf.Clamp01((float)(downloadedSize / (double)downloadSize));
+        }
+
         public static List<string> DefaultAssetBundleNames()
         {
             return new List<string>() { "Prefabs001", "Prefabs002", "Prefabs003" };
