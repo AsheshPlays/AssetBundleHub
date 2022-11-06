@@ -14,6 +14,7 @@ namespace AssetBundleHub.Tasks
     {
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var assetBundleName in context.GetTempAssetBundles())
             {
                 string srcPath = context.GetTempSavePath(assetBundleName);

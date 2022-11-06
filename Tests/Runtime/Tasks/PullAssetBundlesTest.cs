@@ -18,12 +18,14 @@ namespace AssetBundleHubTests
         public void SetUp()
         {
             BundlePullContextFixture.Clear();
+            MockLocalAssetBundleTable.Register();
         }
 
         [TearDown]
         public void TearDown()
         {
             BundlePullContextFixture.Clear();
+            ServiceLocator.instance.Clear();
         }
 
 #if ABHUB_SKIP_DL_TEST

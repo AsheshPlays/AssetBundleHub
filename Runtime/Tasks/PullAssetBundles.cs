@@ -16,10 +16,12 @@ namespace AssetBundleHub.Tasks
             var fetchBundles = new FetchBundles();
             var extractBrokenBundles = new ExtractBrokenBundles(new MD5FileHashGenerator());
             var mergeBundles = new MergeBundles();
-            // TODO: LocalAssetBundleTableへの格納
+            var updateLocalAssetBundleTable = new UpdateLocalAssetBundleTable();
+            var localAssetBundleTable = ServiceLocator.instance.Resolve<ILocalAssetBundleTable>();
             await fetchBundles.Run(context, cancellationToken);
             await extractBrokenBundles.Run(context, cancellationToken);
             await mergeBundles.Run(context, cancellationToken);
+            await updateLocalAssetBundleTable.Run(context, cancellationToken);
         }
     }
 }
