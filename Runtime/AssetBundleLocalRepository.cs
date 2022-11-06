@@ -24,6 +24,11 @@ namespace AssetBundleHub
         // key: assetName value: assetBundleName
         ReadOnlyDictionary<string, string> assetNameToAssetBundleMap;
 
+        public AssetBundleLocalRepository(ILocalAssetBundleTable localAssetBundleTable)
+        {
+            this.localAssetBundleTable = localAssetBundleTable;
+        }
+
         string assetBundleListPath
         {
             get

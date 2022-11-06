@@ -15,8 +15,10 @@ namespace AssetBundleHub
         public static void Initialize()
         {
             instance = new ABHub();
+            // SettingsがLoadされていなければここで読み込むが、上書きする場合には事前にLoadしておくこと。
             AssetBundleHubSettings.Load();
-            instance.localRepository = new AssetBundleLocalRepository();
+            var localAssetBundleTable = ServiceLocator.instance.Resolve<ILocalAssetBundleTable>();
+            instance.localRepository = new AssetBundleLocalRepository(localAssetBundleTable);
         }
 
         public static bool ExistsAssetBundleList() => instance.localRepository.ExistsAssetBundleList();
