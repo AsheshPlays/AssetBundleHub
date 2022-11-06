@@ -18,8 +18,14 @@ namespace AssetBundleHubTests
         public void SetUp()
         {
             Utils.ClearTestDir();
-            ABHub.Initialize();
             AssetBundleHubSettingsFixture.BuildInstance();
+            ABHub.Initialize();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Utils.ClearTestDir();
         }
 
         // AssetBundleListのダウンロード
@@ -36,25 +42,20 @@ namespace AssetBundleHubTests
             var downloadAssetNames = new List<string>()
             {
                 "Prefabs/001/BaseAttackPrefab",
-                "Scenes/AssetBundleSample/AssetBundleSample"
+                "Scenes/Scene01"
             };
 
-            // Downloaderを作成
-            // var downloader = ABHub.CreateDownloader();
+            // 依存先もダウンロード対象にする
+            ulong expectedDownloadSize =
+                4287L + 6543L + 7805L + 32184L +
+                7580L;
 
-            // サイズを出力
-            //
-
-            // var describedClass = new PullAssetBundles();
-            // var assetBundleNames = new List<string>() { "Prefabs001", "Prefabs002", "Prefabs003" };
-            // var context = BundlePullContextFixture.Load(
-            //     new QueueRequestDecorator(runCapacity: 4),
-            //     new UnityWebRequestDownloadFile()
-            // );
-            // context.AssetBundleNames = assetBundleNames;
-            // await describedClass.Run(context);
-
-            // Assert.That(context.GetMergedAssetBundles().Count(), Is.EqualTo(3));
+            var downloader = ABHub.CreateDownloader();
+            downloader.SetDownloadTarget(downloadAssetNames);
+            Assert.That(downloader.DownloadSize, Is.EqualTo(expectedDownloadSize));
+            Assert.That(downloader.DownloadProgress, Is.EqualTo(0));
+            var result = await downloader.DownloadAsync();
+            Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Success));
         });
     }
 }
