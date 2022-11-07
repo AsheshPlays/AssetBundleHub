@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace AssetBundleHub
 {
@@ -14,21 +15,51 @@ namespace AssetBundleHub
         {
             Success = 0,
             Error = -1,
-            ErrorAssetBundleInfoNotFound = -3,
-            ErrorDuplicatedRequest = -4, // SavePathが同じだと呼ばれる。
-            HTTPException = -5,
-            NetworkException = -6,
-            Timeout = -7,
-            AssetBundleBroken = -8,
+            ConnectionError = -2,
+            ProtocolError = -3,
+            DataProcessingError = -4,
+            Timeout = -5,
+            AssetBundleBroken = -6,
         }
 
         public ReturnStatus Status { get; private set; }
-        public string Message { get; private set; }
+        public Exception Error { get; private set; }
 
-        public AssetBundleDownloadResult(ReturnStatus status, string message = "")
+        public AssetBundleDownloadResult(ReturnStatus status, Exception error = null)
         {
             Status = status;
-            Message = message;
+            Error = error;
+        }
+
+        public static readonly AssetBundleDownloadResult Success = new AssetBundleDownloadResult(ReturnStatus.Success);
+        public static AssetBundleDownloadResult CreateError(Exception ex)
+        {
+            ReturnStatus status = ReturnStatus.Error;
+            switch (ex)
+            {
+                case UnityWebRequestException webex:
+                    status = UnityWebRequestResultToStatus(webex.Result);
+                    break;
+                case TimeoutException:
+                    status = ReturnStatus.Timeout;
+                    break;
+            }
+            return new AssetBundleDownloadResult(status, ex);
+        }
+
+        static ReturnStatus UnityWebRequestResultToStatus(UnityWebRequest.Result result)
+        {
+            switch (result)
+            {
+                case UnityWebRequest.Result.ConnectionError:
+                    return ReturnStatus.ConnectionError;
+                case UnityWebRequest.Result.ProtocolError:
+                    return ReturnStatus.ProtocolError;
+                case UnityWebRequest.Result.DataProcessingError:
+                    return ReturnStatus.DataProcessingError;
+                default:
+                    return ReturnStatus.Error;
+            }
         }
     }
 
@@ -36,7 +67,7 @@ namespace AssetBundleHub
     /// AssetBundleをダウンロードするクラス。
     /// ダウンロード進捗を状態としてもつ。
     /// リトライ可能。
-    /// 複雑なクラス構成にしないためにダウンロード単位でのクラスは作らず本クラスを使い回す。
+    /// 複雑なクラス構成にしないためにダウンロード(リトライ)単位でのクラスは作らず本クラスを使い回す。
     /// </summary>
     public class AssetBundleDownloader
     {
@@ -97,7 +128,7 @@ namespace AssetBundleHub
             if (latestTargetAssetBundles.Count == 0)
             {
                 State = DownloadState.Completed;
-                return new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.Success);
+                return AssetBundleDownloadResult.Success;
             }
 
             var context = new BundlePullContext();
@@ -108,13 +139,29 @@ namespace AssetBundleHub
             {
                 State = DownloadState.Running;
                 await repository.PullAssetBundles(context, cancellationToken);
-                result = new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.Success);
-                State = DownloadState.Completed;
+                if (context.Error == null)
+                {
+                    if (context.ExistsBrokenAssetBundle())
+                    {
+                        State = DownloadState.Failed;
+                        result = new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.AssetBundleBroken);
+                    }
+                    else
+                    {
+                        State = DownloadState.Completed;
+                        result = AssetBundleDownloadResult.Success;
+                    }
+                }
+                else
+                {
+                    State = DownloadState.Failed;
+                    result = AssetBundleDownloadResult.CreateError(context.Error);
+                }
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 State = DownloadState.Failed;
-                result = new AssetBundleDownloadResult(AssetBundleDownloadResult.ReturnStatus.Error, ex.Message);
+                result = AssetBundleDownloadResult.CreateError(ex);
             }
             return result;
         }
@@ -176,7 +223,7 @@ namespace AssetBundleHub
         // 計算量を少なくするために必要なときにだけ進捗を取得するようにする。
         public float CalcProgress()
         {
-            if(pullOutputProgress == null)
+            if (pullOutputProgress == null)
             {
                 return startProgress;
             }

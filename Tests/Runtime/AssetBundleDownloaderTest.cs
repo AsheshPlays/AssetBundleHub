@@ -52,5 +52,46 @@ namespace AssetBundleHubTests
             Assert.That(downloader.CalcProgress, Is.EqualTo(1.0f));
             Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Success));
         });
+
+        public class MockDownloadAsyncDecoratorsFactory : IDownloadAsyncDecoratorsFactory
+        {
+            Func<IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]> createFunc;
+
+            public MockDownloadAsyncDecoratorsFactory(Func<IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]> createFunc)
+            {
+                this.createFunc = createFunc;
+            }
+
+            public IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] Create() => createFunc();
+        }
+
+        [UnityTest]
+        public IEnumerator 異常系_Timeout() => UniTask.ToCoroutine(async () =>
+        {
+            var asyncDecoratorsFactory = new MockDownloadAsyncDecoratorsFactory(() =>
+            {
+                return new IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]
+                {
+                    new QueueRequestDecorator(runCapacity: 1),
+                    new MockErrorDownload(){ exception = new TimeoutException("timeout!") }
+                };
+            });
+
+            ServiceLocator.Instance.Register<IDownloadAsyncDecoratorsFactory>(asyncDecoratorsFactory);
+
+            var downloader = ABHub.CreateDownloader();
+            var downloadAssetNames = new List<string>()
+            {
+                "Prefabs/001/BaseAttackPrefab",
+                "Scenes/Scene01"
+            };
+
+            downloader.SetDownloadTarget(downloadAssetNames);
+            var result = await downloader.DownloadAsync();
+            Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Timeout));
+        });
+
+        // TODO: BrokenAssetBundleのテスト
+        // TODO: リトライのテスト
     }
 }
