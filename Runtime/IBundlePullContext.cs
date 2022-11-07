@@ -29,7 +29,7 @@ namespace AssetBundleHub
         public TimeSpan Timeout { get; } // 各ファイルダウンロードのタイムアウト
         IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DownloadAsyncDecorators { get; }
 
-        // Output
+        // Output Setter
         // 進捗はProgressのみを保持し、どれくらいダウンロードしたのかは取得時に算出する。
         // 理由は計算量減らすため。
         void SetDownloadProgress(string assetBundleName, float progress);
@@ -41,6 +41,7 @@ namespace AssetBundleHub
         /// </summary>
         IEnumerable<string> GetTempAssetBundles();
         void ReportBrokenAssetBundle(string assetBundleName);
+        public bool ExistsBrokenAssetBundle();
 
         void SetMergedAssetBundle(string assetBundleName);
         IEnumerable<string> GetMergedAssetBundles();
@@ -69,6 +70,7 @@ namespace AssetBundleHub
         Dictionary<string, float> downloadProgress = new Dictionary<string, float>();
         List<string> tempAssetBundles = new List<string>();
         List<string> mergedAssetBundles = new List<string>();
+        bool broken = false;
 
         public BundlePullContext(params IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] decorators)
         {
@@ -146,7 +148,10 @@ namespace AssetBundleHub
         public void ReportBrokenAssetBundle(string assetBundleName)
         {
             tempAssetBundles.Remove(assetBundleName);
+            broken = true;
         }
+
+        public bool ExistsBrokenAssetBundle() => broken;
 
         public void SetMergedAssetBundle(string assetBundleName)
         {
@@ -160,11 +165,7 @@ namespace AssetBundleHub
 
         static IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[] DefaultDecorators()
         {
-            return new IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]
-            {
-                new QueueRequestDecorator(runCapacity: 4),
-                new UnityWebRequestDownloadFile()
-            };
+            return ServiceLocator.Instance.Resolve<IDownloadAsyncDecoratorsFactory>().Create();
         }
     }
 }

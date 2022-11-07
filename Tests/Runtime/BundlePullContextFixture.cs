@@ -37,6 +37,7 @@ namespace AssetBundleHubTests
         public List<string> downloadedAssetBundles = new List<string>();
         public List<string> tempAssetBundles = new List<string>();
         public List<string> mergedAssetBundles = new List<string>();
+        public bool broken = false;
 
         public string GetDestPath(string assetBundleName)
         {
@@ -126,6 +127,8 @@ namespace AssetBundleHubTests
         {
             tempAssetBundles.Remove(assetBundleName);
         }
+
+        public bool ExistsBrokenAssetBundle() => broken;
 
         public void SetMergedAssetBundle(string assetBundleName)
         {
