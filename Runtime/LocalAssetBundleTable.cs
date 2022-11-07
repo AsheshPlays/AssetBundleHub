@@ -116,7 +116,7 @@ namespace AssetBundleHub
             TrySave();
         }
 
-        public static LocalAssetBundleTable Create()
+        public static LocalAssetBundleTable Load()
         {
             string filePath = AssetBundleHubSettings.Instance.localAssetBundleTablePath;
             LocalAssetBundleTable instance = null;

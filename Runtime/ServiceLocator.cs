@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace AssetBundleHub
 {
-    // ABHubに特化したServiceLocator
+    // AssetBundleHubに特化したServiceLocator
+    // AssetBundleHubの挙動を変える場合には機能単位でインタフェースを登録することで上書きする。
     // Resolve時に何も登録されてなければDefaultを呼び出す。
     // ServiceLocatorのRegisterはABHubのInitializeよりも前限定にし、ABHub.InitializeのタイミングでDefaultをいれるという手もある。
     // しかし、Initializeで使わないインスタンスはInitializeより後にRegisterしても無駄なく動くようにするために、Resolve時にDefaultのCreateを呼ぶ。
@@ -11,8 +12,9 @@ namespace AssetBundleHub
     {
         public static ServiceLocator Instance { get; private set; } = new ServiceLocator(new Dictionary<Type, Func<object>>()
             {
-                { typeof(ILocalAssetBundleTable), LocalAssetBundleTable.Create },
-                { typeof(IAssetBundleListLoader), AssetBundleListLoader.Create }
+                { typeof(ILocalAssetBundleTable), LocalAssetBundleTable.Load },
+                { typeof(IAssetBundleListLoader), AssetBundleListLoader.New },
+                { typeof(IDownloadAsyncDecoratorsFactory), DownloadAsyncDecoratorsFactory.New },
             }
         );
 

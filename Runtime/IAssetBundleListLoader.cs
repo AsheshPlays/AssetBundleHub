@@ -14,6 +14,6 @@ namespace AssetBundleHub
     {
         public AssetBundleList Load(string path) => AssetBundleList.LoadFromFile(path);
 
-        public static AssetBundleListLoader Create() => new AssetBundleListLoader();
+        public static AssetBundleListLoader New() => new AssetBundleListLoader();
     }
 }
