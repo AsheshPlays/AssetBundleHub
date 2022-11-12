@@ -10,7 +10,7 @@ namespace AssetBundleHub.Tasks
     /// TempのAssetBundleが破損しているかどうかを確認
     /// 破損していた場合にはそれをPullContextに報告
     /// </summary>
-    public class ExtractBrokenBundles
+    public class ExtractBrokenBundles : IBundlePullTask
     {
         IFileHashGenerator hashGenerator;
 

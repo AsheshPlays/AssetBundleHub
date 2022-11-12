@@ -8,20 +8,15 @@ using UnityEngine;
 
 namespace AssetBundleHub.Tasks
 {
-    public class PullAssetBundles
+    public class PullAssetBundles : IBundlePullTask
     {
         public async UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Defaultの流れ TODO: インタフェース切って外から入れる。
-            var fetchBundles = new FetchBundles();
-            var extractBrokenBundles = new ExtractBrokenBundles(new MD5FileHashGenerator());
-            var mergeBundles = new MergeBundles();
-            var updateLocalAssetBundleTable = new UpdateLocalAssetBundleTable();
-            var localAssetBundleTable = ServiceLocator.Instance.Resolve<ILocalAssetBundleTable>();
-            await fetchBundles.Run(context, cancellationToken);
-            await extractBrokenBundles.Run(context, cancellationToken);
-            await mergeBundles.Run(context, cancellationToken);
-            await updateLocalAssetBundleTable.Run(context, cancellationToken);
+            var bundlePullTasks = ServiceLocator.Instance.Resolve<IBundlePullTasksFactory>();
+            foreach (var task in bundlePullTasks.Create())
+            {
+                await task.Run(context, cancellationToken);
+            }
         }
     }
 }

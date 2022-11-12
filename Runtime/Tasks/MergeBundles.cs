@@ -10,7 +10,7 @@ namespace AssetBundleHub.Tasks
     /// <summary>
     /// TempからDestにAssetBundleを移動させる
     /// </summary>
-    public class MergeBundles
+    public class MergeBundles : IBundlePullTask
     {
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {

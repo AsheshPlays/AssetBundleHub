@@ -10,7 +10,7 @@ namespace AssetBundleHub.Tasks
     /// <summary>
     /// AssetBundleをダウンロードしてTempに保存
     /// </summary>
-    public class FetchBundles
+    public class FetchBundles : IBundlePullTask
     {
         readonly Func<IDownloadRequestContext, CancellationToken, UniTask<IDownloadResponseContext>> next;
 

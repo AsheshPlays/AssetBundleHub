@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace AssetBundleHub
 {
-    public class UpdateLocalAssetBundleTable
+    public class UpdateLocalAssetBundleTable : IBundlePullTask
     {
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
