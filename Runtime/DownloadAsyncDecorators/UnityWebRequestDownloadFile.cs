@@ -24,7 +24,6 @@ namespace AssetBundleHub
 
             try
             {
-                // TODO: downloadedBytesをreportするために、ToUniTaskを使わずにwhile(true)で回して待った方がよさそう
                 await request.SendWebRequest().ToUniTask(context.Progress, cancellationToken: linkToken.Token);
             }
             catch (OperationCanceledException ex) when (ex.CancellationToken == linkToken.Token)
