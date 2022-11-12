@@ -7,6 +7,9 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
 using NUnit.Framework;
+using System.Linq;
+using System.IO;
+using AssetBundleHub.Tasks;
 
 namespace AssetBundleHubTests
 {
@@ -66,7 +69,7 @@ namespace AssetBundleHubTests
         }
 
         [UnityTest]
-        public IEnumerator 異常系_Timeout() => UniTask.ToCoroutine(async () =>
+        public IEnumerator 準正常系_Timeout() => UniTask.ToCoroutine(async () =>
         {
             var asyncDecoratorsFactory = new MockDownloadAsyncDecoratorsFactory(() =>
             {
@@ -91,7 +94,47 @@ namespace AssetBundleHubTests
             Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Timeout));
         });
 
-        // TODO: BrokenAssetBundleのテスト
+        // ダウンロードしたAssetBundleを故意に破損させる
+        public class BreakDownloadedAssetBundle : IBundlePullTask
+        {
+            public async UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                string targetAssetBundle = context.GetTempAssetBundles().Last();
+                string assetBundlePath = context.GetTempSavePath(targetAssetBundle);
+                await File.AppendAllTextAsync(assetBundlePath, "hoge", System.Text.Encoding.UTF8, cancellationToken);
+            }
+        }
+
+        public class ThrowBrokenAssetBundleTasks : IBundlePullTasksFactory
+        {
+            public IList<IBundlePullTask> Create()
+            {
+                return new List<IBundlePullTask>(){
+                    new FetchBundles(),
+                    new BreakDownloadedAssetBundle(),
+                    new ExtractBrokenBundles(new MD5FileHashGenerator()),
+                    new MergeBundles(),
+                    new UpdateLocalAssetBundleTable()
+                };
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator 準正常系_BrokenAssetBundle() => UniTask.ToCoroutine(async () =>
+        {
+            ServiceLocator.Instance.Register<IBundlePullTasksFactory>(new ThrowBrokenAssetBundleTasks());
+
+            var downloader = ABHub.CreateDownloader();
+            var downloadAssetNames = new List<string>()
+            {
+                "Prefabs/001/BaseAttackPrefab",
+                "Scenes/Scene01"
+            };
+
+            downloader.SetDownloadTarget(downloadAssetNames);
+            var result = await downloader.DownloadAsync();
+            Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.AssetBundleBroken));
+        });
         // TODO: リトライのテスト
     }
 }
