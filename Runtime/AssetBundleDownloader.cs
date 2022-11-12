@@ -199,11 +199,16 @@ namespace AssetBundleHub
 
         bool IsDownloadableState() => State == DownloadState.Idle || State == DownloadState.Failed;
 
-        // ダウンロード対象と、ダウンロード済みのサイズの確認
-        void PrepareDownload()
+        /// <summary>
+        /// ダウンロード対象と、ダウンロード済みのサイズの確認
+        /// リトライ直前に呼ぶので、リトライ前に呼ぶ必要はない。
+        /// リトライするよりも前にProgressを取得したいときには呼ぶ。
+        /// </summary>
+        public void PrepareDownload()
         {
             // リトライ用に、すでにダウンロード済みのABをダウンロード対象から外す
             ulong downloadedSize = 0L;
+            pullOutputProgress = null;
             var target = new List<AssetBundleInfo>();
             foreach (var abInfo in initialTartetAssetBundles)
             {

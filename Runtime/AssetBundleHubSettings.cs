@@ -22,6 +22,8 @@ namespace AssetBundleHub
         // Initiallize後に入れる想定
         public int timeoutSec = 30;
         public string baseUrl;
+        public int parallelCount = 4; // ダウンロード時の並列数
+        public bool shuffle = true; // ダウンロード順番をシャッフルさせるかどうか
 
         public string tempSavePath;
         public string TempSavePath => tempSavePath;

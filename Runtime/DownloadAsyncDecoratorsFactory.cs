@@ -15,7 +15,7 @@ namespace AssetBundleHub
         {
             return new IDownloadAsyncDecorator<IDownloadRequestContext, IDownloadResponseContext>[]
             {
-                new QueueRequestDecorator(runCapacity: 4),
+                new QueueRequestDecorator(runCapacity: AssetBundleHubSettings.Instance.parallelCount),
                 new UnityWebRequestDownloadFile()
             };
         }

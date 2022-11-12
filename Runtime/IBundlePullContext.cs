@@ -55,7 +55,7 @@ namespace AssetBundleHub
 
         public List<string> AssetBundleNames { get; set; }
 
-        public bool Shuffle { get; set; } = true;
+        public bool Shuffle { get; set; }
 
         public TimeSpan Timeout { get; set; }
 
@@ -76,6 +76,7 @@ namespace AssetBundleHub
         {
             this.settings = AssetBundleHubSettings.Instance;
             Timeout = settings.Timeout;
+            Shuffle = settings.shuffle;
             DownloadAsyncDecorators = decorators.Length != 0 ? decorators : DefaultDecorators();
         }
 
