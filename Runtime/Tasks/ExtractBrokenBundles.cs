@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -21,6 +22,22 @@ namespace AssetBundleHub.Tasks
 
         public UniTask Run(IBundlePullContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
+            var brokenAssetBundles = ExtractAllBrokenAssetBundleOrNull(context);
+
+            if (brokenAssetBundles != null)
+            {
+                foreach (var assetBundleName in brokenAssetBundles)
+                {
+                    // Debug.Log($"fileHash not match want {assetBundleInfo.FileHash} got {fileHash}");
+                    context.ReportBrokenAssetBundle(assetBundleName);
+                }
+            }
+            return UniTask.CompletedTask;
+        }
+
+        HashSet<string> ExtractAllBrokenAssetBundleOrNull(IBundlePullContext context)
+        {
+            HashSet<string> brokenAssetBundles = null;
             foreach (var assetBundleName in context.GetTempAssetBundles())
             {
                 string assetBundlePath = context.GetTempSavePath(assetBundleName);
@@ -31,11 +48,14 @@ namespace AssetBundleHub.Tasks
                 string fileHash = hashGenerator.ComputeHash(assetBundlePath);
                 if (fileHash != assetBundleInfo.FileHash)
                 {
-                    Debug.Log($"fileHash not match want {assetBundleInfo.FileHash} got {fileHash}");
-                    context.ReportBrokenAssetBundle(assetBundleName);
+                    if (brokenAssetBundles == null)
+                    {
+                        brokenAssetBundles = new HashSet<string>();
+                    }
+                    brokenAssetBundles.Add(assetBundleName);
                 }
             }
-            return UniTask.CompletedTask;
+            return brokenAssetBundles;
         }
     }
 }
