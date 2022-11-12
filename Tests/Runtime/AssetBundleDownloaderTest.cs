@@ -49,10 +49,10 @@ namespace AssetBundleHubTests
             downloader.SetDownloadTarget(downloadAssetNames);
 
             Assert.That(downloader.DownloadSize, Is.EqualTo(expectedDownloadSize));
-            Assert.That(downloader.CalcProgress, Is.EqualTo(0));
+            Assert.That(downloader.CalcProgress(), Is.EqualTo(0));
 
             var result = await downloader.DownloadAsync();
-            Assert.That(downloader.CalcProgress, Is.EqualTo(1.0f));
+            Assert.That(downloader.CalcProgress(), Is.EqualTo(1.0f));
             Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Success));
         });
 
@@ -135,6 +135,43 @@ namespace AssetBundleHubTests
             var result = await downloader.DownloadAsync();
             Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.AssetBundleBroken));
         });
-        // TODO: リトライのテスト
+
+        [UnityTest]
+        public IEnumerator リトライ() => UniTask.ToCoroutine(async () =>
+        {
+            AssetBundleHubSettings.Instance.parallelCount = 1;
+            AssetBundleHubSettings.Instance.shuffle = false; // 破損させるAssetBundleを固定
+            // before ダウンロードを失敗させる
+            ServiceLocator.Instance.Register<IBundlePullTasksFactory>(new ThrowBrokenAssetBundleTasks());
+
+            var downloader = ABHub.CreateDownloader();
+            var downloadAssetNames = new List<string>()
+            {
+                "Prefabs/001/BaseAttackPrefab",
+                "Scenes/Scene01"
+            };
+
+            downloader.SetDownloadTarget(downloadAssetNames);
+            var result = await downloader.DownloadAsync();
+            Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.AssetBundleBroken));
+
+            // Mockを消すことでリトライは成功させる
+            ServiceLocator.Instance.UnRegister<IBundlePullTasksFactory>();
+
+            Assert.That(downloader.CalcProgress(), Is.EqualTo(1.0f));
+            // NOTE: 実際にはPrepareDownloadを事前に呼ぶ必要はないが本テストではProgress取得のために呼ぶ。
+            downloader.PrepareDownload();
+            int percentage = (int)(downloader.CalcProgress() * 100);
+            // ulong expectedDownloadSize =
+            //     4287L + 6543L + 7805L + 32184L +
+            //     7580L; <- 破損分
+            // => 合計 58399
+            // ダウンロード成功分 50819
+            // 50819 / 58399 = 0.870203257f
+            Assert.That(percentage, Is.EqualTo(87));
+            result = await downloader.DownloadAsync();
+            Assert.That(downloader.CalcProgress(), Is.EqualTo(1.0f));
+            Assert.That(result.Status, Is.EqualTo(AssetBundleDownloadResult.ReturnStatus.Success));
+        });
     }
 }

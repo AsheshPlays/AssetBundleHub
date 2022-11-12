@@ -32,6 +32,11 @@ namespace AssetBundleHub
             container[typeof(T)] = obj;
         }
 
+        public bool UnRegister<T>() where T : class
+        {
+            return container.Remove(typeof(T));
+        }
+
         public T Resolve<T>() where T : class
         {
             Type targetType = typeof(T);

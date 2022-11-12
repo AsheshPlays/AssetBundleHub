@@ -18,6 +18,8 @@ namespace AssetBundleHubTests
             string assetBundleListName = "AssetBundleList.json";
             settings.assetBundleListUrl = settings.baseUrl + assetBundleListName;
             settings.assetBundleListName = assetBundleListName;
+            settings.parallelCount = 4;
+            settings.shuffle = true;
         }
     }
 }
