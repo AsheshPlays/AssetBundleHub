@@ -1,11 +1,9 @@
 {
-    "name": "AssetBundleHub.Editor.Tests",
-    "rootNamespace": "AssetBundleHubEditorTests",
+    "name": "AssetBundleHub.Tests",
+    "rootNamespace": "AssetBundleHubTests",
     "references": [
         "AssetBundleHub",
-        "AssetBundleHub.Editor",
-        "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner"
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"
@@ -13,9 +11,7 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"

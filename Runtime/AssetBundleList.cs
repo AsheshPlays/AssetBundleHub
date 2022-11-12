@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.IO;
 
 namespace AssetBundleHub
 {
@@ -56,6 +57,13 @@ namespace AssetBundleHub
                 GetDependenciesRecursive(srcAssetBundle, dep, depSet);
             }
         }
+
+        // TODO: AssetBundleListを暗号化したらこのメソッドは使えないので別メソッドを経由する。
+        public static AssetBundleList LoadFromFile(string path)
+        {
+            string assetBundleListJson = File.ReadAllText(path);
+            return JsonUtility.FromJson<AssetBundleList>(assetBundleListJson);
+        }
     }
 
     [Serializable]
@@ -77,8 +85,9 @@ namespace AssetBundleHub
         [SerializeField] List<string> directDependencies;
         public List<string> DirectDependencies => directDependencies;
 
+        // NOTE: プロジェクト直下Assetsからのパスではなく、ビルド時に設定したaddressableNameが格納されている。
         [SerializeField] List<string> assetNames;
-        public List<string> AssetNames => assetNames; // Assetのパス。シーンのパスも分けずにここに入れる。
+        public List<string> AssetNames => assetNames;
 
         public AssetBundleInfo(string name, string hash, string fileHash, int size, List<string> directDependencies, List<string> assetNames)
         {
