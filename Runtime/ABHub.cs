@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace AssetBundleHub
 {
@@ -11,6 +8,7 @@ namespace AssetBundleHub
         static ABHub instance;
 
         AssetBundleLocalRepository localRepository;
+        ABAssetRepository assetRepository;
 
         public static void Initialize()
         {
@@ -18,7 +16,9 @@ namespace AssetBundleHub
             // SettingsがLoadされていなければここで読み込むが、上書きする場合には事前にLoadしておくこと。
             AssetBundleHubSettings.Load();
             var localAssetBundleTable = ServiceLocator.Instance.Resolve<ILocalAssetBundleTable>();
-            instance.localRepository = new AssetBundleLocalRepository(localAssetBundleTable);
+            var assetBundleReader = ServiceLocator.Instance.Resolve<IAssetBundleReader>();
+            instance.localRepository = new AssetBundleLocalRepository(localAssetBundleTable, assetBundleReader);
+            instance.assetRepository = new ABAssetRepository(instance.localRepository);
         }
 
         public static bool ExistsAssetBundleList() => instance.localRepository.ExistsAssetBundleList();
@@ -40,5 +40,27 @@ namespace AssetBundleHub
                 repository
             );
         }
+
+        public static AssetContainer CreateLoadContainer()
+        {
+            return new AssetContainer(instance.assetRepository);
+        }
+
+        public static T GetAsset<T>(string assetName) where T : UnityEngine.Object
+        {
+            return instance.assetRepository.GetAsset<T>(assetName);
+        }
+
+        /// <summary>
+        /// ロードしたAssetBundleの状態を確認したい時等に使う
+        /// </summary>
+        public static ABHubReader CreateReader()
+        {
+            var reader = new ABHubReader();
+            reader.localRepository = instance.localRepository;
+            return reader;
+        }
+
+        public static void UnloadAllAssetBundles() => instance.localRepository.UnloadAll();
     }
 }

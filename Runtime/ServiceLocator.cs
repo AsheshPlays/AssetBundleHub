@@ -16,6 +16,7 @@ namespace AssetBundleHub
                 { typeof(IAssetBundleListLoader), AssetBundleListLoader.New },
                 { typeof(IDownloadAsyncDecoratorsFactory), DownloadAsyncDecoratorsFactory.New },
                 { typeof(IBundlePullTasksFactory), DefaultBundlePullTasks.New },
+                { typeof(IAssetBundleReader), DefaultAssetBundleReader.New }
             }
         );
 
