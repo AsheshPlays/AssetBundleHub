@@ -1,5 +1,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace AssetBundleHub
 {
@@ -9,6 +10,7 @@ namespace AssetBundleHub
 
         AssetBundleLocalRepository localRepository;
         ABAssetRepository assetRepository;
+        ABSceneRepository sceneRepository;
 
         public static void Initialize()
         {
@@ -19,6 +21,7 @@ namespace AssetBundleHub
             var assetBundleReader = ServiceLocator.Instance.Resolve<IAssetBundleReader>();
             instance.localRepository = new AssetBundleLocalRepository(localAssetBundleTable, assetBundleReader);
             instance.assetRepository = new ABAssetRepository(instance.localRepository);
+            instance.sceneRepository = new ABSceneRepository(instance.localRepository);
         }
 
         public static bool ExistsAssetBundleList() => instance.localRepository.ExistsAssetBundleList();
@@ -50,6 +53,12 @@ namespace AssetBundleHub
         {
             return instance.assetRepository.GetAsset<T>(assetName);
         }
+
+
+        /// <param name="sceneName">sceneのAssetBundleのaddressableName</param>
+        public static bool IsSceneAssetBundleLoaded(string sceneName) => instance.sceneRepository.IsSceneAssetBundleLoaded(sceneName);
+        public static UniTask<AssetBundle> LoadSceneAssetBundleAsync(string sceneName) => instance.sceneRepository.LoadAsync(sceneName);
+        public static void UnloadSceneAssetBundle(string sceneName) => instance.sceneRepository.Unload(sceneName);
 
         /// <summary>
         /// ロードしたAssetBundleの状態を確認したい時等に使う
