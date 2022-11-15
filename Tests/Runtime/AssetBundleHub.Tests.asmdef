@@ -3,15 +3,21 @@
     "rootNamespace": "AssetBundleHubTests",
     "references": [
         "AssetBundleHub",
-        "UniTask"
+        "UniTask",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
-        "Editor"
+        "Android",
+        "Editor",
+        "iOS",
+        "macOSStandalone"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"

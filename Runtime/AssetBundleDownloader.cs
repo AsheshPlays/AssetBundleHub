@@ -111,6 +111,10 @@ namespace AssetBundleHub
             State = DownloadState.Idle;
             pullOutputProgress = null;
             initialTartetAssetBundles = GetAssetBundleNameSet(assetNames).Select(x => assetBundleInfoStore.AssetBundleList.Infos[x]).ToList();
+            if(initialTartetAssetBundles.Count == 0)
+            {
+                return;
+            }
             DownloadSize = SumSize(initialTartetAssetBundles);
         }
 
