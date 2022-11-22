@@ -60,7 +60,7 @@ namespace AssetBundleHub
         /// </summary>
         public bool TrySave()
         {
-            if (!string.IsNullOrEmpty(FilePath))
+            if (string.IsNullOrEmpty(FilePath))
             {
                 return false;
             }
