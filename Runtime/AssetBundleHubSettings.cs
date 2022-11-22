@@ -41,18 +41,17 @@ namespace AssetBundleHub
 
         static AssetBundleHubSettings EditorSettings()
         {
-            return new AssetBundleHubSettings()
-            {
-                tempSavePath = "Temp/AB",
-                saveDataPath = "SaveData/AB",
-                localAssetBundleTablePath = "SaveData/AB/LocalAssetBundleTable.json"
-            };
+            var settings = BuildDefault();
+            settings.tempSavePath = "Temp/AB";
+            settings.saveDataPath = "SaveData/AB";
+            settings.localAssetBundleTablePath = "SaveData/AB/LocalAssetBundleTable.json";
+            return settings;
         }
 
         // Default。ABHubのInitialize前なら差し替え可
         // TODO: iosでBackup対象からはずすこと
         // https://light11.hatenadiary.com/entry/2019/10/07/031405
-        static AssetBundleHubSettings AppSettings()
+        static AssetBundleHubSettings BuildDefault()
         {
             return new AssetBundleHubSettings()
             {
@@ -71,7 +70,7 @@ namespace AssetBundleHub
 #if UNITY_EDITOR
             instance = EditorSettings();
 #else
-            instance = AppSettings();
+            instance = BuildDefault();
 #endif
         }
     }
