@@ -23,6 +23,7 @@ namespace AssetBundleHub
         }
 
         public ReturnStatus Status { get; private set; }
+        public bool IsSuccess => Status == ReturnStatus.Success;
         public Exception Error { get; private set; }
 
         public AssetBundleDownloadResult(ReturnStatus status, Exception error = null)
