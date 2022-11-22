@@ -70,11 +70,15 @@ namespace AssetBundleHubTests
             ulong downloadSize = 0L;
             ulong downloadedSize = 0L;
 
-            foreach (var kvp in downloadProgress)
+            foreach (var abName in AssetBundleNames)
             {
-                var abSize = AssetBundleList.Infos[kvp.Key].Size;
-                var progress = kvp.Value;
+                var abSize = AssetBundleList.Infos[abName].Size;
                 downloadSize += (ulong)abSize;
+
+                if(!downloadProgress.TryGetValue(abName, out float progress))
+                {
+                    continue;
+                }
 
                 if (Mathf.Approximately(progress, 1.0f))
                 {
@@ -86,6 +90,10 @@ namespace AssetBundleHubTests
                     // floatだとint最大値のときにはみ出すので8byteのdoubleを使用
                     downloadedSize += (ulong)(abSize * (double)progress);
                 }
+            }
+            if(downloadSize == 0L)
+            {
+                return 0f;
             }
 
             return Mathf.Clamp01((float)(downloadedSize / (double)downloadSize));
