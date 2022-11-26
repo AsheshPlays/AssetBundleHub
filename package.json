@@ -2,12 +2,13 @@
   "name": "com.teach310.assetbundlehub",
   "version": "0.0.1",
   "displayName": "Asset Bundle Hub",
-  "description": "This is an example package",
+  "description": "This Library provides simple AssetBundle management for Unity.",
   "unity": "2021.3",
   "unityRelease": "0b5",
   "documentationUrl": "https://example.com/",
   "keywords": [
-    "AssetBundle"
+    "AssetBundle",
+    "unity"
   ],
   "author": {
     "name": "teach310"
@@ -17,5 +18,11 @@
     "com.unity.scriptablebuildpipeline": "1.20.2",
     "com.cysharp.unitask": "2.3.1"
   },
-  "hideInEditor": false
+  "hideInEditor": false,
+  "license": "MIT",
+  "homepage": "https://github.com/teach310/AssetBundleHub/blob/main/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/teach310/AssetBundleHub"
+  }
 }
