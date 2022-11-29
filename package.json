@@ -5,7 +5,9 @@
   "description": "This Library provides simple AssetBundle management for Unity.",
   "unity": "2021.3",
   "unityRelease": "0b5",
-  "documentationUrl": "https://example.com/",
+  "documentationUrl": "https://github.com/teach310/AssetBundleHub",
+  "changelogUrl": "https://github.com/teach310/AssetBundleHub/releases",
+  "licensesUrl": "https://github.com/teach310/AssetBundleHub/blob/main/LICENSE",
   "keywords": [
     "AssetBundle",
     "unity"
