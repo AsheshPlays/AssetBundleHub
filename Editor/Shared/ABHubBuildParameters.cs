@@ -19,6 +19,7 @@ namespace AssetBundleHubEditor
         public string AssetBundleListName { get; set; } = "AssetBundleList.json";
         public EncryptType EncryptType { get; set; } = EncryptType.None;
         public string CryptKeyBase { get; set; }
+        public bool ExtractBuiltinShader { get; set; } = true;
 
         public ABHubBuildParameters(BuildTarget target, BuildTargetGroup group, string outputFolder)
             : base(target, group, outputFolder)

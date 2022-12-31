@@ -42,7 +42,7 @@ namespace AssetBundleHubEditor
         /// </summary>
         /// <param name="buildMap">key: assetBundle名 value: assetのプロジェクトの相対パス</param>
         /// <returns></returns>
-        public static void BuildAssetBundles(ABHubBuildParameters buildParameters, Dictionary<string, List<string>> buildMap, bool extractBuiltinShader = true)
+        public static void BuildAssetBundles(ABHubBuildParameters buildParameters, Dictionary<string, List<string>> buildMap)
         {
             foreach (var kvp in buildMap)
             {
@@ -60,18 +60,7 @@ namespace AssetBundleHubEditor
             }
 
             var buildContent = new BundleBuildContent(builds);
-
-            IList<IBuildTask> tasks = null;
-            if (extractBuiltinShader)
-            {
-                tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleBuiltInShaderExtraction);
-            }
-            else
-            {
-                tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleCompatible);
-            }
-
-            tasks.Add(new CreateAssetBundleList(new MD5FileHashGenerator())); // ビルド結果からAssetBundleListを生成
+            var tasks = CreateTaskList(buildParameters.ExtractBuiltinShader);
             ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out IBundleBuildResults results, tasks);
 
             Debug.Log($"BuildAssetBundles finished exitCode : {exitCode}");
@@ -110,6 +99,22 @@ namespace AssetBundleHubEditor
                 return assetPathWithoutExtention;
             }
             return assetPathWithoutExtention.Replace(match.Value, "");
+        }
+
+        static IList<IBuildTask> CreateTaskList(bool extractBuiltinShader)
+        {
+            IList<IBuildTask> tasks = null;
+            if (extractBuiltinShader)
+            {
+                tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleBuiltInShaderExtraction);
+            }
+            else
+            {
+                tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleCompatible);
+            }
+
+            tasks.Add(new CreateAssetBundleList(new MD5FileHashGenerator())); // ビルド結果からAssetBundleListを生成
+            return tasks;
         }
     }
 }
