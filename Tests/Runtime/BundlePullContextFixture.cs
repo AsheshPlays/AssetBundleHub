@@ -75,7 +75,7 @@ namespace AssetBundleHubTests
                 var abSize = AssetBundleList.Infos[abName].Size;
                 downloadSize += (ulong)abSize;
 
-                if(!downloadProgress.TryGetValue(abName, out float progress))
+                if (!downloadProgress.TryGetValue(abName, out float progress))
                 {
                     continue;
                 }
@@ -91,7 +91,7 @@ namespace AssetBundleHubTests
                     downloadedSize += (ulong)(abSize * (double)progress);
                 }
             }
-            if(downloadSize == 0L)
+            if (downloadSize == 0L)
             {
                 return 0f;
             }
