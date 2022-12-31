@@ -8,6 +8,7 @@ using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEngine;
 using UnityEngine.Build.Pipeline;
 using AssetBundleHub;
+using AssetBundleHubEditor.Interfaces;
 
 namespace AssetBundleHubEditor.Tasks
 {
@@ -18,6 +19,9 @@ namespace AssetBundleHubEditor.Tasks
 #pragma warning disable 649
         [InjectContext(ContextUsage.In)]
         IBundleBuildResults results;
+
+        [InjectContext(ContextUsage.In)]
+        IABHubBuildParameters abHubBuildParameters;
 #pragma warning restore 649
 
         IFileHashGenerator fileHashGenerator;
@@ -32,7 +36,7 @@ namespace AssetBundleHubEditor.Tasks
             var bundleDetails = results.BundleInfos;
             var assetBundleList = BuildDetailsToAssetBundleList(bundleDetails);
             string dirPath = Path.GetDirectoryName(bundleDetails.Values.First().FileName);
-            string path = Path.Combine(dirPath, "AssetBundleList.json");
+            string path = Path.Combine(dirPath, abHubBuildParameters.AssetBundleListName);
             File.WriteAllText(path, JsonUtility.ToJson(assetBundleList));
             return ReturnCode.Success;
         }

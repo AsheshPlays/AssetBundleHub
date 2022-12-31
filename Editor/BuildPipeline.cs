@@ -9,6 +9,7 @@ using UnityEditor.Build.Pipeline;
 using UnityEditor.Build.Pipeline.Interfaces;
 using AssetBundleHub;
 using AssetBundleHubEditor.Tasks;
+using AssetBundleHubEditor.Interfaces;
 
 namespace AssetBundleHubEditor
 {
@@ -42,7 +43,7 @@ namespace AssetBundleHubEditor
         /// </summary>
         /// <param name="buildMap">key: assetBundle名 value: assetのプロジェクトの相対パス</param>
         /// <returns></returns>
-        public static void BuildAssetBundles(ABHubBuildParameters buildParameters, Dictionary<string, List<string>> buildMap)
+        public static void BuildAssetBundles(ABHubBuildParameters buildParameters, Dictionary<string, List<string>> buildMap, params IContextObject[] contextObjects)
         {
             foreach (var kvp in buildMap)
             {
@@ -61,7 +62,10 @@ namespace AssetBundleHubEditor
 
             var buildContent = new BundleBuildContent(builds);
             var tasks = CreateTaskList(buildParameters.ExtractBuiltinShader);
-            ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out IBundleBuildResults results, tasks);
+            var additionalContexts = new IContextObject[contextObjects.Length + 1];
+            Array.Copy(contextObjects, additionalContexts, contextObjects.Length);
+            additionalContexts[additionalContexts.Length - 1] = buildParameters as IABHubBuildParameters;
+            ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out IBundleBuildResults results, tasks, additionalContexts);
 
             Debug.Log($"BuildAssetBundles finished exitCode : {exitCode}");
         }
