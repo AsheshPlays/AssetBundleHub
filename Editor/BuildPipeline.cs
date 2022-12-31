@@ -52,33 +52,7 @@ namespace AssetBundleHubEditor
                 }
             }
 
-            // AssetBundle名とそれに含めるアセットを指定する
-            // ~~Resources/以下がアドレスになる
-            var regex = new Regex(".*Resources/", RegexOptions.Compiled);
-            // AssetBundle名とそれに含めるアセットを指定する
-            var builds = buildMap.Select(x =>
-            {
-                var build = new AssetBundleBuild();
-                build.assetBundleName = x.Key;
-                var assetNames = new string[x.Value.Count];
-                var addressableNames = new string[x.Value.Count];
-                for (int i = 0; i < x.Value.Count; i++)
-                {
-                    string assetPath = x.Value[i];
-                    assetNames[i] = assetPath;
-                    string addressableName = Path.ChangeExtension(assetPath, null); // 拡張子消す
-                    var match = regex.Match(addressableName.ToString());
-                    if (!string.IsNullOrEmpty(match.Value))
-                    {
-                        addressableName = addressableName.Replace(match.Value, "");
-                    }
-                    addressableNames[i] = addressableName;
-                }
-                build.assetNames = assetNames;
-                build.addressableNames = addressableNames;
-                return build;
-            }).ToArray();
-
+            var builds = CreateAssetBundleBuilds(buildMap);
             if (builds.Length == 0)
             {
                 Debug.Log("AssetBundleBuild Count 0");
@@ -87,7 +61,6 @@ namespace AssetBundleHubEditor
 
             var buildContent = new BundleBuildContent(builds);
 
-            IBundleBuildResults results; // 依存関係とかはここからとってこれる
             IList<IBuildTask> tasks = null;
             if (extractBuiltinShader)
             {
@@ -99,9 +72,44 @@ namespace AssetBundleHubEditor
             }
 
             tasks.Add(new CreateAssetBundleList(new MD5FileHashGenerator())); // ビルド結果からAssetBundleListを生成
-            ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out results, tasks);
+            ReturnCode exitCode = ContentPipeline.BuildAssetBundles(buildParameters, buildContent, out IBundleBuildResults results, tasks);
 
             Debug.Log($"BuildAssetBundles finished exitCode : {exitCode}");
+        }
+
+        static AssetBundleBuild[] CreateAssetBundleBuilds(Dictionary<string, List<string>> buildMap)
+        {
+            // AssetBundle名とそれに含めるアセットを指定する
+            // ~~Resources/以下がアドレスになる
+            var regex = new Regex(".*Resources/", RegexOptions.Compiled);
+            // AssetBundle名とそれに含めるアセットを指定する
+            return buildMap.Select(x =>
+            {
+                var assetNames = new string[x.Value.Count];
+                var addressableNames = new string[x.Value.Count];
+                for (int i = 0; i < x.Value.Count; i++)
+                {
+                    string assetPath = x.Value[i];
+                    assetNames[i] = assetPath;
+                    addressableNames[i] = AssetPathToAddressableName(assetPath, regex);
+                }
+                var build = new AssetBundleBuild();
+                build.assetBundleName = x.Key;
+                build.assetNames = assetNames;
+                build.addressableNames = addressableNames;
+                return build;
+            }).ToArray();
+        }
+
+        static string AssetPathToAddressableName(string assetPath, Regex regex)
+        {
+            string assetPathWithoutExtention = Path.ChangeExtension(assetPath, null);
+            var match = regex.Match(assetPathWithoutExtention);
+            if (string.IsNullOrEmpty(match.Value))
+            {
+                return assetPathWithoutExtention;
+            }
+            return assetPathWithoutExtention.Replace(match.Value, "");
         }
     }
 }
