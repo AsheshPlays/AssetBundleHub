@@ -28,7 +28,7 @@ namespace AssetBundleHubEditor
         {
             var buildTarget = BuildTarget.StandaloneOSX;
             var buildTargetGroup = BuildTargetGroup.Standalone;
-            var buildParameters = new BundleBuildParameters(buildTarget, buildTargetGroup, outputFolder);
+            var buildParameters = new ABHubBuildParameters(buildTarget, buildTargetGroup, outputFolder);
             buildParameters.UseCache = false;
             buildParameters.BundleCompression = BuildCompression.LZ4;
             buildParameters.AppendHash = false; // ファイル名にHashを加えるのはAssetBundleの機能ではなくAssetBundleHub側で行う。
@@ -42,7 +42,7 @@ namespace AssetBundleHubEditor
         /// </summary>
         /// <param name="buildMap">key: assetBundle名 value: assetのプロジェクトの相対パス</param>
         /// <returns></returns>
-        public static void BuildAssetBundles(BundleBuildParameters buildParameters, Dictionary<string, List<string>> buildMap, bool extractBuiltinShader = true)
+        public static void BuildAssetBundles(ABHubBuildParameters buildParameters, Dictionary<string, List<string>> buildMap, bool extractBuiltinShader = true)
         {
             foreach (var kvp in buildMap)
             {
