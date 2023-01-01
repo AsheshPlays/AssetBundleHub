@@ -21,7 +21,7 @@ namespace AssetBundleHubEditor.Tasks
         IBundleBuildResults results;
 
         [InjectContext(ContextUsage.In)]
-        IABHubBuildParameters abHubBuildParameters;
+        IABHubBuildParameters parameters;
 #pragma warning restore 649
 
         IFileHashGenerator fileHashGenerator;
@@ -35,9 +35,7 @@ namespace AssetBundleHubEditor.Tasks
         {
             var bundleDetails = results.BundleInfos;
             var assetBundleList = BuildDetailsToAssetBundleList(bundleDetails);
-            string dirPath = Path.GetDirectoryName(bundleDetails.Values.First().FileName);
-            string path = Path.Combine(dirPath, abHubBuildParameters.AssetBundleListName);
-            File.WriteAllText(path, JsonUtility.ToJson(assetBundleList));
+            File.WriteAllText(parameters.GetOutputFilePathForIdentifier(parameters.AssetBundleListName), JsonUtility.ToJson(assetBundleList));
             return ReturnCode.Success;
         }
 

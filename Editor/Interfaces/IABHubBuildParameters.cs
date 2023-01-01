@@ -11,7 +11,7 @@ namespace AssetBundleHubEditor.Interfaces
     /// <summary>
     /// ABHub専用のAssetBundleビルド時の設定パラメータ
     /// </summary>
-    public interface IABHubBuildParameters : IContextObject
+    public interface IABHubBuildParameters : IBundleBuildParameters
     {
         /// <summary>
         /// AssetBundleListのファイル名
