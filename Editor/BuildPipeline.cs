@@ -106,6 +106,12 @@ namespace AssetBundleHubEditor
             }
 
             tasks.Add(new CreateAssetBundleList()); // ビルド結果からAssetBundleListを生成
+
+            if (parameters.EncryptType != EncryptType.None)
+            {
+                tasks.Add(new EncryptAssetBundles());
+            }
+
             return tasks;
         }
     }
