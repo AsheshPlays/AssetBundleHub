@@ -98,5 +98,12 @@ namespace AssetBundleHub
             this.directDependencies = directDependencies;
             this.assetNames = assetNames;
         }
+
+        // 暗号化するときにFileHashだけは更新する
+        // どこでセットするか検索しやすくするためにプロパティーではなく別メソッドにしておく
+        public void SetFileHash(string fileHash)
+        {
+            this.fileHash = fileHash;
+        }
     }
 }

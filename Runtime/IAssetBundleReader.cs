@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -27,6 +28,27 @@ namespace AssetBundleHub
         public async UniTask<AssetBundle> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
         {
             return await AssetBundle.LoadFromFileAsync(path, 0).ToUniTask(cancellationToken: cancellationToken);
+        }
+    }
+
+    public class XORAssetBundleReader : IAssetBundleReader
+    {
+        byte[] keyBytes;
+
+        public XORAssetBundleReader(byte[] keyBytes)
+        {
+            this.keyBytes = keyBytes;
+        }
+
+        public async UniTask<AssetBundle> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
+        {
+            AssetBundle assetBundle = null;
+            using (var fs = new FileStream(path, FileMode.Open))
+            using (var cs = new XORCryptStream(fs, keyBytes))
+            {
+                assetBundle = await AssetBundle.LoadFromStreamAsync(cs, 0).ToUniTask(cancellationToken: cancellationToken);
+            }
+            return assetBundle;
         }
     }
 }

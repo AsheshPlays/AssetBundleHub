@@ -43,7 +43,7 @@ namespace AssetBundleHub
 
             var found = assetBundleCache.TryGetRef(abName, out var abRef);
 
-            if(found && abRef.Count > 0)
+            if (found && abRef.Count > 0)
             {
                 Debug.LogError($"{abName} already loaded");
                 return abRef.AssetBundle;
