@@ -19,5 +19,7 @@ namespace AssetBundleHubEditor.Interfaces
         /// EncryptTypeがNone以外の場合に使用
         /// </summary>
         string CryptKeyBase { get; set; }
+
+        IFileHashGenerator FileHashGenerator { get; set; }
     }
 }

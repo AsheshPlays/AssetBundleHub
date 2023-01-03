@@ -24,13 +24,6 @@ namespace AssetBundleHubEditor.Tasks
         IABHubBuildParameters parameters;
 #pragma warning restore 649
 
-        IFileHashGenerator fileHashGenerator;
-
-        public CreateAssetBundleList(IFileHashGenerator fileHashGenerator)
-        {
-            this.fileHashGenerator = fileHashGenerator;
-        }
-
         public ReturnCode Run()
         {
             var assetBundleList = BuildDetailsToAssetBundleList(results.BundleInfos);
@@ -53,7 +46,7 @@ namespace AssetBundleHubEditor.Tasks
                 var details = kvp.Value;
                 string assetBundleRelativePath = details.FileName;
                 var dep = details.Dependencies.ToList();
-                string hash = fileHashGenerator.ComputeHash(assetBundleRelativePath);
+                string hash = parameters.FileHashGenerator.ComputeHash(assetBundleRelativePath);
                 string fileHash = hash; // 破損チェック用
 
                 // ファイルサイズ取得
