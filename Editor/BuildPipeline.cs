@@ -25,19 +25,6 @@ namespace AssetBundleHubEditor
             Debug.Log($"export buildMap {exporter.ExportPath}");
         }
 
-        public static void BuildAssetBundlesStandaloneOSX(string outputFolder = "AssetBundles/StandaloneOSX", string loadPath = "Assets/AssetBundleResources")
-        {
-            var buildTarget = BuildTarget.StandaloneOSX;
-            var buildTargetGroup = BuildTargetGroup.Standalone;
-            var buildParameters = new ABHubBuildParameters(buildTarget, buildTargetGroup, outputFolder);
-            buildParameters.UseCache = false;
-            buildParameters.BundleCompression = BuildCompression.LZ4;
-            buildParameters.AppendHash = false; // ファイル名にHashを加えるのはAssetBundleの機能ではなくAssetBundleHub側で行う。
-
-            var buildMap = new BuildMapFactory().Create(loadPath, false);
-            BuildAssetBundles(buildParameters, buildMap);
-        }
-
         /// <summary>
         /// AssetBundleをビルドするメソッドのサンプル
         /// </summary>
