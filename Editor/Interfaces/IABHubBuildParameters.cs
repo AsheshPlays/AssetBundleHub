@@ -1,13 +1,9 @@
+using AssetBundleHub;
+using AssetBundleHubEditor;
 using UnityEditor.Build.Pipeline.Interfaces;
 
 namespace AssetBundleHubEditor.Interfaces
 {
-    public enum EncryptType
-    {
-        None,
-        XOR
-    }
-
     /// <summary>
     /// ABHub専用のAssetBundleビルド時の設定パラメータ
     /// </summary>
