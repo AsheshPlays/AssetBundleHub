@@ -25,19 +25,6 @@ namespace AssetBundleHubEditor
             Debug.Log($"export buildMap {exporter.ExportPath}");
         }
 
-        public static void BuildAssetBundlesStandaloneOSX(string outputFolder = "AssetBundles/StandaloneOSX", string loadPath = "Assets/AssetBundleResources")
-        {
-            var buildTarget = BuildTarget.StandaloneOSX;
-            var buildTargetGroup = BuildTargetGroup.Standalone;
-            var buildParameters = new ABHubBuildParameters(buildTarget, buildTargetGroup, outputFolder);
-            buildParameters.UseCache = false;
-            buildParameters.BundleCompression = BuildCompression.LZ4;
-            buildParameters.AppendHash = false; // ファイル名にHashを加えるのはAssetBundleの機能ではなくAssetBundleHub側で行う。
-
-            var buildMap = new BuildMapFactory().Create(loadPath, false);
-            BuildAssetBundles(buildParameters, buildMap);
-        }
-
         /// <summary>
         /// AssetBundleをビルドするメソッドのサンプル
         /// </summary>
@@ -52,6 +39,7 @@ namespace AssetBundleHubEditor
                     throw new ArgumentException("AssetBundleName is null or empty");
                 }
             }
+            buildParameters.SetDefaultParamsIfNeeded();
 
             var builds = CreateAssetBundleBuilds(buildMap);
             if (builds.Length == 0)
@@ -61,7 +49,7 @@ namespace AssetBundleHubEditor
             }
 
             var buildContent = new BundleBuildContent(builds);
-            var tasks = CreateTaskList(buildParameters.ExtractBuiltinShader);
+            var tasks = CreateTaskList(buildParameters);
             var additionalContexts = new IContextObject[contextObjects.Length + 1];
             Array.Copy(contextObjects, additionalContexts, contextObjects.Length);
             additionalContexts[additionalContexts.Length - 1] = buildParameters as IABHubBuildParameters;
@@ -105,10 +93,10 @@ namespace AssetBundleHubEditor
             return assetPathWithoutExtention.Replace(match.Value, "");
         }
 
-        static IList<IBuildTask> CreateTaskList(bool extractBuiltinShader)
+        static IList<IBuildTask> CreateTaskList(ABHubBuildParameters parameters)
         {
             IList<IBuildTask> tasks = null;
-            if (extractBuiltinShader)
+            if (parameters.ExtractBuiltinShader)
             {
                 tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleBuiltInShaderExtraction);
             }
@@ -117,7 +105,13 @@ namespace AssetBundleHubEditor
                 tasks = DefaultBuildTasks.Create(DefaultBuildTasks.Preset.AssetBundleCompatible);
             }
 
-            tasks.Add(new CreateAssetBundleList(new MD5FileHashGenerator())); // ビルド結果からAssetBundleListを生成
+            tasks.Add(new CreateAssetBundleList()); // ビルド結果からAssetBundleListを生成
+
+            if (parameters.EncryptType != EncryptType.None)
+            {
+                tasks.Add(new EncryptAssetBundles());
+            }
+
             return tasks;
         }
     }

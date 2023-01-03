@@ -24,17 +24,9 @@ namespace AssetBundleHubEditor.Tasks
         IABHubBuildParameters parameters;
 #pragma warning restore 649
 
-        IFileHashGenerator fileHashGenerator;
-
-        public CreateAssetBundleList(IFileHashGenerator fileHashGenerator)
-        {
-            this.fileHashGenerator = fileHashGenerator;
-        }
-
         public ReturnCode Run()
         {
-            var bundleDetails = results.BundleInfos;
-            var assetBundleList = BuildDetailsToAssetBundleList(bundleDetails);
+            var assetBundleList = BuildDetailsToAssetBundleList(results.BundleInfos);
             File.WriteAllText(parameters.GetOutputFilePathForIdentifier(parameters.AssetBundleListName), JsonUtility.ToJson(assetBundleList));
             return ReturnCode.Success;
         }
@@ -42,19 +34,19 @@ namespace AssetBundleHubEditor.Tasks
         /// <summary>
         /// AssetBundleListを作成
         /// </summary>
-        /// <param name="bundleDetails">keyはassetBundleのファイル名、value.FileNameは相対パス</param>
+        /// <param name="bundleInfos">keyはassetBundleのファイル名、value.FileNameは相対パス</param>
         /// <returns></returns>
-        AssetBundleList BuildDetailsToAssetBundleList(Dictionary<string, BundleDetails> bundleDetails)
+        AssetBundleList BuildDetailsToAssetBundleList(Dictionary<string, BundleDetails> bundleInfos)
         {
             var infoList = new List<AssetBundleInfo>();
             AssetBundle.UnloadAllAssetBundles(true); // すでにロード済みだとバグるので
-            foreach (var kvp in bundleDetails)
+            foreach (var kvp in bundleInfos)
             {
                 string assetBundleName = kvp.Key;
                 var details = kvp.Value;
                 string assetBundleRelativePath = details.FileName;
                 var dep = details.Dependencies.ToList();
-                string hash = fileHashGenerator.ComputeHash(assetBundleRelativePath);
+                string hash = parameters.FileHashGenerator.ComputeHash(assetBundleRelativePath);
                 string fileHash = hash; // 破損チェック用
 
                 // ファイルサイズ取得
