@@ -227,12 +227,13 @@ namespace AssetBundleHub
                     await LoadAsync(d); // 参照カウントを中途半端に終わらせたくないためここではキャンセルさせない
                 }
 
-                assetBundle = await assetBundleReader.LoadFromFileAsync(GetAssetBundlePath(assetBundleName));
+                var assetBundleRef = await assetBundleReader.LoadFromFileAsync(GetAssetBundlePath(assetBundleName));
+                assetBundle = assetBundleRef.AssetBundle;
                 if (assetBundle == null)
                 {
                     throw new Exception($"loaded assetbundle is null {assetBundleName}");
                 }
-                assetBundleRefs.Add(assetBundleName, new AssetBundleRef(assetBundle));
+                assetBundleRefs.Add(assetBundleName, assetBundleRef);
             }
             finally
             {

@@ -11,7 +11,7 @@ namespace AssetBundleHub
     /// </summary>
     public interface IAssetBundleReader
     {
-        UniTask<AssetBundle> LoadFromFileAsync(string path, CancellationToken cancellationToken = default);
+        UniTask<AssetBundleRef> LoadFromFileAsync(string path, CancellationToken cancellationToken = default);
     }
 
     public static class DefaultAssetBundleReader
@@ -25,9 +25,10 @@ namespace AssetBundleHub
     /// </summary>
     public class AssetBundleReader : IAssetBundleReader
     {
-        public async UniTask<AssetBundle> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
+        public async UniTask<AssetBundleRef> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
         {
-            return await AssetBundle.LoadFromFileAsync(path, 0).ToUniTask(cancellationToken: cancellationToken);
+            var assetBundle = await AssetBundle.LoadFromFileAsync(path, 0).ToUniTask(cancellationToken: cancellationToken);
+            return new AssetBundleRef(assetBundle);
         }
     }
 
@@ -40,7 +41,7 @@ namespace AssetBundleHub
             this.keyBytes = keyBytes;
         }
 
-        public async UniTask<AssetBundle> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
+        public async UniTask<AssetBundleRef> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
         {
             AssetBundle assetBundle = null;
             using (var fs = new FileStream(path, FileMode.Open))
@@ -48,7 +49,7 @@ namespace AssetBundleHub
             {
                 assetBundle = await AssetBundle.LoadFromStreamAsync(cs, 0).ToUniTask(cancellationToken: cancellationToken);
             }
-            return assetBundle;
+            return new AssetBundleRef(assetBundle);
         }
     }
 }
