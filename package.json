@@ -1,6 +1,6 @@
 {
   "name": "com.teach310.assetbundlehub",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Asset Bundle Hub",
   "description": "This Library provides simple AssetBundle management for Unity.",
   "unity": "2021.3",
