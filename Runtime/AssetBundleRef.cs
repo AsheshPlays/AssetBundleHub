@@ -14,8 +14,9 @@ namespace AssetBundleHub
     {
         public AssetBundle AssetBundle { get; private set; }
         public int Count { get; private set; }
+        List<IDisposable> disposables; // Streamの解放タイミングを制御するために保持
 
-        public AssetBundleRef(AssetBundle assetBundle)
+        public AssetBundleRef(AssetBundle assetBundle, List<IDisposable> disposables = null)
         {
             if (assetBundle == null)
             {
@@ -24,6 +25,7 @@ namespace AssetBundleHub
 
             AssetBundle = assetBundle;
             Count = 1;
+            this.disposables = disposables;
         }
 
         internal void IncrementRefCount()
@@ -34,6 +36,18 @@ namespace AssetBundleHub
         internal void DecrementRefCount()
         {
             Count--;
+        }
+
+        public void Unload(bool unloadAllLoadedObjects)
+        {
+            AssetBundle.Unload(unloadAllLoadedObjects);
+            if (disposables != null)
+            {
+                foreach (var disposable in disposables)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
     }
 }
