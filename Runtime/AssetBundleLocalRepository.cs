@@ -326,7 +326,7 @@ namespace AssetBundleHub
             {
                 DecrementRefCountRecursive(assetBundleName, assetBundleName, onNoRef: (key, abRef) =>
                 {
-                    abRef.AssetBundle.Unload(true); // NOTE: 読み込み済みAssetは強制解放。参照カウント0ならAssetは参照されていないと判断する。
+                    abRef.Unload(true); // NOTE: 読み込み済みAssetは強制解放。参照カウント0ならAssetは参照されていないと判断する。
                     assetBundleRefs.Remove(key);
                 });
             }
@@ -340,7 +340,7 @@ namespace AssetBundleHub
         {
             foreach (var kvp in assetBundleRefs)
             {
-                kvp.Value.AssetBundle.Unload(true);
+                kvp.Value.Unload(true);
             }
             assetBundleRefs.Clear();
         }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -41,15 +43,15 @@ namespace AssetBundleHub
             this.keyBytes = keyBytes;
         }
 
+        // NOTE: streamはAssetBundleをUnloadした後にDisposeする必要がある
+        // https://docs.unity3d.com/ja/2021.3/ScriptReference/AssetBundle.LoadFromStreamAsync.html
         public async UniTask<AssetBundleRef> LoadFromFileAsync(string path, CancellationToken cancellationToken = default)
         {
             AssetBundle assetBundle = null;
-            using (var fs = new FileStream(path, FileMode.Open))
-            using (var cs = new XORCryptStream(fs, keyBytes))
-            {
-                assetBundle = await AssetBundle.LoadFromStreamAsync(cs, 0).ToUniTask(cancellationToken: cancellationToken);
-            }
-            return new AssetBundleRef(assetBundle);
+            var fs = new FileStream(path, FileMode.Open);
+            var cs = new XORCryptStream(fs, keyBytes);
+            assetBundle = await AssetBundle.LoadFromStreamAsync(cs, 0).ToUniTask(cancellationToken: cancellationToken);
+            return new AssetBundleRef(assetBundle, new List<IDisposable>() { cs, fs });
         }
     }
 }
